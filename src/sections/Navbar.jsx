@@ -39,7 +39,7 @@ function Navbar() {
             .to(linkRef.current, {
                 autoAlpha: 1,
                 x: 0,
-                stagger: 0.1,
+                stagger: 0.3,
                 duration: 0.5,
                 ease: "power3.out",
             }, "<")
