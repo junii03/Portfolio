@@ -29,7 +29,7 @@ const Services = () => {
         });
     }, []);
     return (
-        <section id="Services" className="relative min-h-screen bg-black rounded-t-4xl">
+        <section id="services" className="relative min-h-screen bg-black rounded-t-4xl">
             <AnimatedHeaderSection
                 subtitle="Behind the scene, Beyond the screen"
                 title="Services"
