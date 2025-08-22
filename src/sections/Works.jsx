@@ -4,7 +4,6 @@ import { projects } from '../constants';
 import { Icon } from '@iconify/react/dist/iconify.js';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { overlay, xor } from 'three/tsl';
 
 const Works = () => {
     const [currentIndex, setCurrentIndex] = useState(null)
