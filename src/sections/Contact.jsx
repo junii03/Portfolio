@@ -42,7 +42,7 @@ const Contact = () => {
                             Phone
                         </h2>
                         <div className="w-full h-px my-2 bg-white/30" />
-                        <p className="lowercase md:text-2xl ld:text-3xl tracking-wider">+93 303 8455524</p>
+                        <p className="lowercase md:text-2xl ld:text-3xl tracking-wider">+92 303 8455524</p>
                     </div>
                     <div className="social-link">
                         <h2>
