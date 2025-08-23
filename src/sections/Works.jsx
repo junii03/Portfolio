@@ -122,7 +122,7 @@ const Works = () => {
                     </div>
                 ))}
                 {/* desktop floating preview */}
-                <div ref={previewRef} className='fixed -top-2/6  left-0 z-50 overflow-hidden border-8 border-black pointer-events-none w-[960px] md:block opacity-0  hidden '>
+                <div ref={previewRef} className='fixed -top-2/6  left-0 z-50 overflow-hidden border-8 border-black pointer-events-none w-[960px] md:block opacity-0  hidden rounded-2xl'>
                     {currentIndex !== null && projects[currentIndex] && (<img src={projects[currentIndex].image} alt="preview " className='object-cover w-full h-full rounded-md  ' />)}
 
 
