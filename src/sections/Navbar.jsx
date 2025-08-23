@@ -78,6 +78,29 @@ function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    // Close navbar when clicking outside
+    useEffect(() => {
+        if (!isOpened) return;
+        function handleClickOutside(e) {
+            if (
+                navRef.current &&
+                !navRef.current.contains(e.target) &&
+                e.target !== topLineRef.current &&
+                e.target !== bottomLineRef.current
+            ) {
+                tl.current.reverse();
+                iconTl.current.reverse();
+                setIsOpened(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('touchstart', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('touchstart', handleClickOutside);
+        };
+    }, [isOpened]);
+
     return (
         <>
             {/* Sidebar Menu */}
