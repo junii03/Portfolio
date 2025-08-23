@@ -1,121 +1,231 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import gsap from "gsap";
 import { Observer } from "gsap/all";
-import { useEffect, useRef } from "react";
-
+import { useEffect, useRef, useState, useCallback } from "react";
 
 gsap.registerPlugin(Observer);
-const Marquee = ({ items, className = "text-white bg-black", icon = "mdi:star-four-points", iconClassName = "", reverse = false }) => {
+
+export default function Marquee({
+    items = [],
+    className = "text-white bg-black",
+    icon = "mdi:star-four-points",
+    iconClassName = "",
+    reverse = false,
+    speed = 100 // px / second base speed (increase to go faster)
+}) {
     const containerRef = useRef(null);
-    const itemsRef = useRef([]);
-    function horizontalLoop(items, config) {
-        items = gsap.utils.toArray(items);
-        config = config || {};
-        let tl = gsap.timeline({ repeat: config.repeat, paused: config.paused, defaults: { ease: "none" }, onReverseComplete: () => tl.totalTime(tl.rawTime() + tl.duration() * 100) }),
-            length = items.length,
-            startX = items[0].offsetLeft,
-            times = [],
-            widths = [],
-            xPercents = [],
-            curIndex = 0,
-            pixelsPerSecond = (config.speed || 1) * 100,
-            snap = config.snap === false ? v => v : gsap.utils.snap(config.snap || 1), // some browsers shift by a pixel to accommodate flex layouts, so for example if width is 20% the first element's width might be 242px, and the next 243px, alternating back and forth. So we snap to 5 percentage points to make things look more natural
-            totalWidth, curX, distanceToStart, distanceToLoop, item, i;
-        gsap.set(items, { // convert "x" to "xPercent" to make things responsive, and populate the widths/xPercents Arrays to make lookups faster.
-            xPercent: (i, el) => {
-                let w = widths[i] = parseFloat(gsap.getProperty(el, "width", "px"));
-                xPercents[i] = snap(parseFloat(gsap.getProperty(el, "x", "px")) / w * 100 + gsap.getProperty(el, "xPercent"));
-                return xPercents[i];
-            }
-        });
-        gsap.set(items, { x: 0 });
-        totalWidth = items[length - 1].offsetLeft + xPercents[length - 1] / 100 * widths[length - 1] - startX + items[length - 1].offsetWidth * gsap.getProperty(items[length - 1], "scaleX") + (parseFloat(config.paddingRight) || 0);
-        for (i = 0; i < length; i++) {
-            item = items[i];
-            curX = xPercents[i] / 100 * widths[i];
-            distanceToStart = item.offsetLeft + curX - startX;
-            distanceToLoop = distanceToStart + widths[i] * gsap.getProperty(item, "scaleX");
-            tl.to(item, { xPercent: snap((curX - distanceToLoop) / widths[i] * 100), duration: distanceToLoop / pixelsPerSecond }, 0)
-                .fromTo(item, { xPercent: snap((curX - distanceToLoop + totalWidth) / widths[i] * 100) }, { xPercent: xPercents[i], duration: (curX - distanceToLoop + totalWidth - curX) / pixelsPerSecond, immediateRender: false }, distanceToLoop / pixelsPerSecond)
-                .add("label" + i, distanceToStart / pixelsPerSecond);
-            times[i] = distanceToStart / pixelsPerSecond;
-        }
-        function toIndex(index, vars) {
-            vars = vars || {};
-            (Math.abs(index - curIndex) > length / 2) && (index += index > curIndex ? -length : length); // always go in the shortest direction
-            let newIndex = gsap.utils.wrap(0, length, index),
-                time = times[newIndex];
-            if (time > tl.time() !== index > curIndex) { // if we're wrapping the timeline's playhead, make the proper adjustments
-                vars.modifiers = { time: gsap.utils.wrap(0, tl.duration()) };
-                time += tl.duration() * (index > curIndex ? 1 : -1);
-            }
-            curIndex = newIndex;
-            vars.overwrite = true;
-            return tl.tweenTo(time, vars);
-        }
-        tl.next = vars => toIndex(curIndex + 1, vars);
-        tl.previous = vars => toIndex(curIndex - 1, vars);
-        tl.current = () => curIndex;
-        tl.toIndex = (index, vars) => toIndex(index, vars);
-        tl.times = times;
-        tl.progress(1, true).progress(0, true); // pre-render for performance
-        if (config.reversed) {
-            tl.vars.onReverseComplete();
-            tl.reverse();
-        }
-        return tl;
-    }
+    const contentRef = useRef(null);
 
+    // number of duplicated sets to render (dynamic)
+    const [copies, setCopies] = useState(2);
+
+    // runtime refs for the ticker-based animation
+    const singleWidthRef = useRef(0);
+    const posRef = useRef(0); // current transform x (px)
+    const lastTimeRef = useRef(performance.now());
+    const runningRef = useRef(true);
+    const speedObjRef = useRef({ v: 1 }); // animated multiplier (can be negative to reverse)
+    const quickSetterRef = useRef(null);
+    const roRef = useRef(null);
+    const observerRef = useRef(null);
+
+    // helper to build one set of items
+    const buildSingleSet = (keyBase = "") => (
+        <div
+            key={keyBase}
+            className="marquee-set inline-flex items-center whitespace-nowrap"
+            style={{ display: "inline-flex", whiteSpace: "nowrap" }}
+            aria-hidden="true"
+        >
+            {items.map((text, idx) => (
+                <span
+                    key={`${keyBase}-${idx}`}
+                    className="flex items-center px-8 md:px-16 gap-x-4 md:gap-x-8"
+                    style={{ display: "inline-flex", whiteSpace: "nowrap" }}
+                >
+                    {text} <Icon icon={icon} className={iconClassName} />
+                </span>
+            ))}
+        </div>
+    );
+
+    // Compute how many copies we need so total content > container + singleWidth (safe loop)
+    const computeCopies = useCallback(() => {
+        const container = containerRef.current;
+        const content = contentRef.current;
+        if (!container || !content) return;
+
+        const firstChild = content.children[0];
+        if (!firstChild) return;
+
+        const singleW = Math.max(1, Math.ceil(firstChild.getBoundingClientRect().width));
+        singleWidthRef.current = singleW;
+
+        const containerW = container.getBoundingClientRect().width;
+
+        // ensure enough copies that total width > container + one single set (buffer)
+        const needed = Math.max(2, Math.ceil((containerW + singleW) / singleW));
+        const finalCopies = Math.max(2, needed + 1); // +1 buffer
+
+        setCopies(prev => (prev !== finalCopies ? finalCopies : prev));
+    }, []);
+
+    // Initialize quickSetter and reset position
+    const initTicker = useCallback(() => {
+        const content = contentRef.current;
+        if (!content) return;
+
+        // Set initial transform
+        posRef.current = 0;
+        gsap.set(content, { x: 0, force3D: true, overwrite: true });
+
+        // quickSetter for super-fast transform writes with no layout queries
+        quickSetterRef.current = gsap.quickSetter(content, "x", "px");
+
+        // reset lastTime
+        lastTimeRef.current = performance.now();
+    }, []);
+
+    // The smooth ticker that moves the content each frame
     useEffect(() => {
+        // don't start until DOM ready
+        initTicker();
 
-        const tl = horizontalLoop(itemsRef.current, {
-            repeat: -1,
-            paddingRight: 30,
-            reversed: reverse,
-        });
+        function tick() {
+            if (!runningRef.current || !contentRef.current) return;
 
-        Observer.create({
-            onChangeY(self) {
-                let factor = 1.5;
-                if ((!reverse && self.deltaY < 0) || (reverse && self.deltaY > 0)) {
-                    factor *= -1;
-                }
-                gsap.timeline({
-                    defaults: {
-                        ease: "none",
-                    }
-                })
-                    .to(tl, { timeScale: factor * 2.5, duration: 0.2, overwrite: true, })
-                    .to(tl, { timeScale: factor / 2.5, duration: 1 }, "+=0.3");
-            }
-        });
+            const now = performance.now();
+            const dt = Math.max(0, (now - lastTimeRef.current) / 1000); // seconds
+            lastTimeRef.current = now;
+
+            const singleW = singleWidthRef.current || 1;
+            const baseDir = reverse ? 1 : -1; // -1 moves left
+            const effectiveSpeed = Math.max(1, speed) * speedObjRef.current.v; // px/sec * multiplier
+
+            // update position
+            posRef.current += baseDir * effectiveSpeed * dt;
+
+            // wrap to keep pos within [-singleW, singleW] for numeric stability
+            if (posRef.current <= -singleW) posRef.current += singleW;
+            if (posRef.current >= singleW) posRef.current -= singleW;
+
+            // write transform via quickSetter
+            if (quickSetterRef.current) quickSetterRef.current(posRef.current);
+            else if (contentRef.current) contentRef.current.style.transform = `translate3d(${posRef.current}px,0,0)`;
+        }
+
+        // attach to gsap ticker (uses RAF internally, integrates with GSAP smoothness)
+        gsap.ticker.add(tick);
+        return () => {
+            gsap.ticker.remove(tick);
+        };
+    }, [initTicker, reverse, speed]);
+
+    // ResizeObserver/resize listener to recompute copies and re-init ticker
+    useEffect(() => {
+        computeCopies();
+        // debounce helper
+        let t;
+        if (typeof ResizeObserver !== "undefined") {
+            roRef.current = new ResizeObserver(() => {
+                clearTimeout(t);
+                t = setTimeout(() => {
+                    computeCopies();
+                    // re-init quickSetter & reset position after DOM update
+                    requestAnimationFrame(() => initTicker());
+                }, 100);
+            });
+            if (containerRef.current) roRef.current.observe(containerRef.current);
+            if (contentRef.current) roRef.current.observe(contentRef.current);
+        } else {
+            const onResize = () => {
+                clearTimeout(t);
+                t = setTimeout(() => {
+                    computeCopies();
+                    requestAnimationFrame(() => initTicker());
+                }, 120);
+            };
+            window.addEventListener("resize", onResize);
+            return () => {
+                window.removeEventListener("resize", onResize);
+            };
+        }
 
         return () => {
-            tl.kill();
-        }
-    }, [items, reverse])
+            if (roRef.current) {
+                try { roRef.current.disconnect(); } catch (e) {
+                    console.log(e);
+                }
+            }
+        };
+    }, [computeCopies, initTicker]);
 
+    // Scroll Observer that temporarily changes multiplier (smoothly) — reduces jitter by animating the multiplier
+    useEffect(() => {
+        observerRef.current = Observer.create({
+            onChangeY(self) {
+                // choose a multiplier; can be negative to reverse briefly
+                let factor = 1.8;
+                if ((!reverse && self.deltaY < 0) || (reverse && self.deltaY > 0)) factor *= -1;
+                // animate multiplier to factor quickly then back to 1
+                gsap.killTweensOf(speedObjRef.current);
+                gsap.to(speedObjRef.current, {
+                    v: factor,
+                    duration: 0.12,
+                    overwrite: true,
+                    onUpdate: () => { /* tick reads v each frame */ }
+                });
+                gsap.to(speedObjRef.current, { v: 1, duration: 0.6, delay: 0.08 });
+            }
+        });
+        return () => {
+            try { observerRef.current && observerRef.current.kill && observerRef.current.kill(); } catch (e) {
+                console.log(e);
+            }
+        };
+    }, [reverse]);
+
+    // Pause/resume on hover (pauses ticker updates)
+    const handleMouseEnter = () => (runningRef.current = false);
+    const handleMouseLeave = () => {
+        // resume and reset time baseline to avoid big dt spike
+        runningRef.current = true;
+        lastTimeRef.current = performance.now();
+    };
+
+    // When copies change we must rebuild sets (useEffect triggers a DOM update)
+    useEffect(() => {
+        // after DOM updates, reinitialize quickSetter + reset pos so visual seam doesn't jitter
+        requestAnimationFrame(() => initTicker());
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [copies]);
+
+    // Build sets array
+    const sets = [];
+    for (let i = 0; i < copies; i++) sets.push(buildSingleSet(`set-${i}`));
 
     return (
         <div
             ref={containerRef}
-            className={`overflow-hidden w-full h-20 md:h-[100px] flex items-center marquee-text-responsive font-light uppercase whitespace-nowrap ${className}`}
+            className={`overflow-hidden w-full h-20 md:h-[100px] flex items-center marquee-text-responsive font-light uppercase ${className}`}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            aria-hidden="true"
+            role="presentation"
+            style={{
+                willChange: "transform",
+                WebkitFontSmoothing: "antialiased",
+                transformStyle: "preserve-3d",
+                // avoid layout paint on transform: use translate3d in writes
+            }}
         >
-            <div className="flex">
-                {items.map((text, index) => (
-                    <span
-                        key={index}
-                        aria-hidden="true"
-                        className="flex items-center px-8 md:px-16 gap-x-16 md:gap-x-32"
-                        ref={(el) => (itemsRef.current[index] = el)}
-                    >
-                        {text} <Icon icon={icon} className={iconClassName} />
-                    </span>
-                ))}
+            <div
+                ref={contentRef}
+                className="inline-flex"
+                style={{ display: "inline-flex", whiteSpace: "nowrap", transform: "translate3d(0,0,0)" }}
+            >
+                {sets}
             </div>
         </div>
     );
-
 }
-
-export default Marquee

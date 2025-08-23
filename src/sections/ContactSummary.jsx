@@ -28,8 +28,6 @@ const ContactSummary = () => {
         "Let's Connect",
         "Contact Me",
         "Let's Connect",
-        "Contact Me",
-        "Let's Connect",
     ];
 
 
@@ -60,7 +58,7 @@ const ContactSummary = () => {
                 </p>
             </div>
             {/* marquee */}
-            <Marquee items={items2} reverse={true} className="text-black bg-transparent border-y-2" iconClassName="stroke-gold stroke-2 text-primary" icon="material-symbols-light:square" />
+            <Marquee items={items2} className="text-black bg-transparent border-y-2" iconClassName="stroke-gold stroke-2 text-primary" icon="material-symbols-light:square" />
         </section>
     )
 }
