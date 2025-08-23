@@ -9,6 +9,8 @@ import Works from './sections/Works'
 import ContactSummary from './sections/ContactSummary'
 import Contact from './sections/Contact'
 import { useProgress } from '@react-three/drei'
+import { SpeedInsights } from '@vercel/speed-insights/react';
+
 
 const App = () => {
     const { progress } = useProgress();
@@ -31,6 +33,7 @@ const App = () => {
                 </div>
             </div>}
             <div className={`${isReady ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`}>
+                <SpeedInsights />
                 <Navbar />
                 <Hero />
                 <ServiceSummary />
