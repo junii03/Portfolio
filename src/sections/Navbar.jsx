@@ -27,9 +27,17 @@ function Navbar() {
     }, [isOpened]);
 
 
+    const burgerRef = useRef(null);
+
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (isOpened && navRef.current && !navRef.current.contains(event.target)) {
+            if (
+                isOpened &&
+                navRef.current &&
+                !navRef.current.contains(event.target) &&
+                burgerRef.current &&
+                !burgerRef.current.contains(event.target) // exclude burger button
+            ) {
                 toggleMenu();
             }
         };
@@ -151,6 +159,7 @@ function Navbar() {
 
             {/* Burger Button */}
             <div
+                ref={burgerRef}
                 aria-label="Menu Button"
                 role="button"
                 style={showBurger ? { clipPath: "circle(50.0% at 50% 50%)" } : { clipPath: "circle(0% at 50% 50%)" }}
