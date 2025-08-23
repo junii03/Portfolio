@@ -116,8 +116,8 @@ const Works = () => {
                         ))}</div>
                         {/* mobile preview images */}
                         <div className='relative flex items-center justify-center px-10 md:hidden h-[400px]'>
-                            <img src={project.bgImage} alt={`${project.name}-bg-img`} className='object-cover w-full h-full rounded-md brightness-50 ' />
-                            <img src={project.image} alt={`${project.name}-mobile-img`} className=' absolute bg-center px-14 rounded-xl' />
+                            <img src={project.bgImage} alt={`${project.name}-bg-img`} className='object-cover w-full h-full rounded-md brightness-50' />
+                            <img src={project.image} alt={`${project.name}-mobile-img`} className=' absolute bg-center px-14 rounded-md' />
                         </div>
                     </div>
                 ))}
