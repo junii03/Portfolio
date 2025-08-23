@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { socials } from '../constants';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
@@ -15,7 +15,7 @@ function Navbar() {
     const [showBurger, setShowBurger] = useState(true);
     const [isOpened, setIsOpened] = useState(false);
 
-    const toggleMenu = () => {
+    const toggleMenu = useCallback(() => {
         if (isOpened) {
             tl.current.reverse();
             iconTl.current.reverse();
@@ -24,7 +24,22 @@ function Navbar() {
             iconTl.current.play();
         }
         setIsOpened(!isOpened);
-    };
+    }, [isOpened]);
+
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (isOpened && navRef.current && !navRef.current.contains(event.target)) {
+                toggleMenu();
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isOpened, toggleMenu]);
+
 
     useGSAP(() => {
         gsap.set(navRef.current, { xPercent: 100 });
@@ -91,6 +106,7 @@ function Navbar() {
                     {['home', 'services', 'about', 'work', 'contact'].map((section, index) => (
                         <div key={index} ref={(el) => (linkRef.current[index] = el)}>
                             <Link
+                                onClick={toggleMenu}
                                 offset={0}
                                 smooth
                                 duration={1500}
