@@ -76,7 +76,7 @@ const Marquee = ({ items, className = "text-white bg-black", icon = "mdi:star-fo
 
         Observer.create({
             onChangeY(self) {
-                let factor = 2.5;
+                let factor = 1.5;
                 if ((!reverse && self.deltaY < 0) || (reverse && self.deltaY > 0)) {
                     factor *= -1;
                 }
@@ -97,12 +97,16 @@ const Marquee = ({ items, className = "text-white bg-black", icon = "mdi:star-fo
 
 
     return (
-        <div ref={containerRef} className={`overflow-hidden w-full h-20 md:h-[100px] flex items-center marquee-text-responsive font-light uppercase whitespace-nowrap ${className}`}>
+        <div
+            ref={containerRef}
+            className={`overflow-hidden w-full h-20 md:h-[100px] flex items-center marquee-text-responsive font-light uppercase whitespace-nowrap ${className}`}
+        >
             <div className="flex">
                 {items.map((text, index) => (
                     <span
                         key={index}
-                        className="flex items-center px-16 gap-x-32 "
+                        aria-hidden="true"
+                        className="flex items-center px-8 md:px-16 gap-x-16 md:gap-x-32"
                         ref={(el) => (itemsRef.current[index] = el)}
                     >
                         {text} <Icon icon={icon} className={iconClassName} />
@@ -110,7 +114,8 @@ const Marquee = ({ items, className = "text-white bg-black", icon = "mdi:star-fo
                 ))}
             </div>
         </div>
-    )
+    );
+
 }
 
 export default Marquee

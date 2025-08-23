@@ -81,7 +81,7 @@ export const projects = [
         id: 1,
         name: "Scents E-commerce",
         description:
-            "An online store specializing in scents and fragrances with a clean, user-friendly interface with integrated admin panel.",
+            "A sleek online fragrance store with a user-friendly interface and integrated admin panel.",
         href: "https://zakisessence.pk/",
         image: "/assets/projects/scents-store.jpeg",
         bgImage: "/assets/backgrounds/scents-background.jpeg",
@@ -95,7 +95,7 @@ export const projects = [
         id: 2,
         name: "HBL Banking Clone",
         description:
-            "An online banking application with a user-friendly interface and secure transactions.",
+            "A full-stack online banking app featuring intuitive UI and secure transactions.",
         href: "https://github.com/junii03/Web-Engineering/tree/7fb9cdfccb73c08263b159a50482014f3856305c/WAD/Project",
         image: "/assets/projects/hbl-clone.png",
         bgImage: "/assets/backgrounds/hbl.jpg",
@@ -111,7 +111,7 @@ export const projects = [
         id: 3,
         name: "Shippacks App",
         description:
-            "Shippacks, your ultimate solution for seamless package delivery. Track, manage, and deliver with ease.",
+            "A mobile app for hassle-free package delivery — track, manage, and deliver with ease.",
         href: "https://play.google.com/store/apps/details?id=com.shippacks.app&pli=1",
         image: "/assets/projects/shippacks.jpeg",
         bgImage: "/assets/backgrounds/delivery.jpg",
@@ -120,14 +120,13 @@ export const projects = [
             { id: 2, name: "Firebase" },
             { id: 3, name: "FCM" },
             { id: 4, name: "Google Maps" },
-
         ],
     },
     {
         id: 4,
         name: "Connecting Seafarer App",
         description:
-            "Connecting Seafarer is the virtual home for global seafarers. This is the most dynamic platform with vast of functionalities for both seafarers and shipping entities.",
+            "A global platform connecting seafarers and shipping entities with real-time communication and community tools.",
         href: "https://play.google.com/store/apps/details?id=com.marinoft.connecting_seafarer",
         image: "/assets/projects/connecting-seafarer.jpeg",
         bgImage: "/assets/backgrounds/seafarer.jpeg",
@@ -138,6 +137,7 @@ export const projects = [
         ],
     },
 ];
+
 export const socials = [
     { name: "Instagram", href: "https://www.instagram.com/junii.03/" },
     { name: "LinkedIn", href: "https://www.linkedin.com/in/junaiddev/" },

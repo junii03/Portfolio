@@ -21,7 +21,14 @@ const ContactSummary = () => {
         "Contact Me",
         "Let's Connect",
         "Contact Me",
-        "Let's Connect", "Contact Me",
+        "Let's Connect",
+        "Contact Me",
+        "Let's Connect",
+        "Contact Me",
+        "Let's Connect",
+        "Contact Me",
+        "Let's Connect",
+        "Contact Me",
         "Let's Connect",
     ];
 

@@ -6,7 +6,7 @@ import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 
 const Services = () => {
-    const text = 'I build sleek digital experiences\n from mobile to web\n where design meets performance';
+    const text = 'From mobile apps to web platforms,\nI craft digital solutions that\nblend creativity and performance.';
     const seriveRef = useRef([]);
     const isDesktop = useMediaQuery({ minWidth: 768 });
     useGSAP(() => {
@@ -31,7 +31,7 @@ const Services = () => {
     return (
         <section id="services" className="relative min-h-screen bg-black rounded-t-4xl">
             <AnimatedHeaderSection
-                subtitle="Behind the scene, Beyond the screen"
+                subtitle="Behind Every Click, There’s Code"
                 title="Services"
                 text={text}
                 textColor="text-white"

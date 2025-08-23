@@ -5,7 +5,7 @@ import { socials } from "../constants";
 import gsap from "gsap";
 
 const Contact = () => {
-    const text = "Got a question or proposal, or just want to say hello?\nMy inbox is always open.\nI am here to answer all your questions.";
+    const text = "Have a project, an idea, or just want to connect?\nMy inbox is always open. Let’s talk.";
     const items = [
         "Just Imagine, I code", "Just Imagine, I code", "Just Imagine, I code", "Just Imagine, I code", "Just Imagine, I code"
     ]
@@ -26,7 +26,7 @@ const Contact = () => {
     return (
         <section id="contact" className="min-h-screen flex flex-col justify-between bg-black">
             <div>
-                <AnimatedHeaderSection subtitle={"You Dream It, I Code It"} title={"Contact"} text={text} textColor={"text-white"} withScrollTrigger={true} />
+                <AnimatedHeaderSection subtitle={"Ideas into Code, Conversations into Collaboration"} title={"Contact"} text={text} textColor={"text-white"} withScrollTrigger={true} />
             </div>
             <div className="flex px-10 font-light text-white uppercase lg:text-[32px] text-[26px] leading-none  mb-10 ">
                 <div className="flex flex-col w-full gap-10">

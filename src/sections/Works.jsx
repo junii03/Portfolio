@@ -100,13 +100,23 @@ const Works = () => {
                 {projects.map((project, index) => (
                     <div key={project.id} id='project' className='relative flex flex-col gap-1 py-5 cursor-pointer group md:gap-0' onMouseEnter={() => handleMouseEnter(index)} onMouseLeave={() => handleMouseLeave(index)} onClick={() => window.open(project.href, '_blank', 'noopener,noreferrer')}>
                         {/* overlay */}
-                        <div className='absolute inset-0  hidden md:block duration-200 bg-black -z-10 clip-path' ref={(el) => { overlayRef.current[index] = el }} />
-                        {/* title */}
-                        <div className='flex justify-between px-10  text-black transition-all duration-500 md:group-hover:px-12 md:group-hover:text-white'>
-                            <h2 className='lg:text-[32px] text-[26px] leading-none '>
-                                {project.name}
-                            </h2>
-                            <Icon icon="mynaui:arrow-up-right-square" className='md:size-6 size-5' />
+                        <div
+                            className='absolute inset-0 hidden md:block duration-200 bg-gradient-to-r from-black/90 via-black/70 to-black/90 -z-10 clip-path'
+                            ref={(el) => { overlayRef.current[index] = el }}
+                        />
+                        {/* title + one-liner */}
+                        <div className='flex flex-col px-10 text-black transition-all duration-500 md:group-hover:px-12 md:group-hover:text-white'>
+                            <div className="flex justify-between items-center">
+                                <h2 className='lg:text-[32px] text-[26px] leading-none '>
+                                    {project.name}
+                                </h2>
+                                <Icon icon="mynaui:arrow-up-right-square" className='md:size-6 size-5' />
+                            </div>
+                            {project.description && (
+                                <p className="mt-1 text-sm md:text-base text-black/70 md:group-hover:text-white/80">
+                                    {project.description}
+                                </p>
+                            )}
                         </div>
                         {/* divider */}
                         <div className='w-full h-0.5 bg-black/80' />
