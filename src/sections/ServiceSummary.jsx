@@ -15,11 +15,11 @@ const ServiceSummary = () => {
             scrollTrigger: { trigger: '#title-service-2', scrub: true }
         });
         gsap.to('#title-service-3', {
-            xPercent: 100,
+            xPercent: 50,
             scrollTrigger: { trigger: '#title-service-3', scrub: true }
         });
         gsap.to('#title-service-4', {
-            xPercent: -100,
+            xPercent: -50,
             scrollTrigger: { trigger: '#title-service-4', scrub: true }
         });
     });
