@@ -98,7 +98,7 @@ const Works = () => {
             <AnimatedHeaderSection subtitle={"Logic meets Aesthetics, Seamlessly"} title={"Works"} text={text} textColor={"text-black"} withScrollTrigger={true} />
             <div className='relative flex flex-col font-light' onMouseMove={handleMouseMove}>
                 {projects.map((project, index) => (
-                    <div key={project.id} id='project' className='relative flex flex-col gap-1 py-5 cursor-pointer group md:gap-0' onMouseEnter={() => handleMouseEnter(index)} onMouseLeave={() => handleMouseLeave(index)}>
+                    <div key={project.id} id='project' className='relative flex flex-col gap-1 py-5 cursor-pointer group md:gap-0' onMouseEnter={() => handleMouseEnter(index)} onMouseLeave={() => handleMouseLeave(index)} onClick={() => window.open(project.href, '_blank', 'noopener,noreferrer')}>
                         {/* overlay */}
                         <div className='absolute inset-0  hidden md:block duration-200 bg-black -z-10 clip-path' ref={(el) => { overlayRef.current[index] = el }} />
                         {/* title */}
