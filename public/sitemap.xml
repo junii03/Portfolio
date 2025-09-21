@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>https://junaid.is-a.dev/</loc>
+        <loc>https://www.junaidafzal.dev/</loc>
+        <changefreq>monthly</changefreq>
         <priority>1.0</priority>
     </url>
-    <!-- Add more <url> entries for other important pages if needed -->
+    <!-- Add more <url> entries for other canonical pages if/when you create route-based pages. -->
 </urlset>
