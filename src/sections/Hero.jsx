@@ -39,7 +39,7 @@ const Hero = () => {
 
     return (
         <section ref={sectionRef} id='home' className='flex flex-col justify-end min-h-screen '>
-            <AnimatedHeaderSection subtitle={"404 No Bugs Found"} title={"Junaid Afzal"} text={text} textColor={"text-black"} />
+            <AnimatedHeaderSection subtitle={"404 No Bugs Found"} title={"Junaid Afzal"} text={text} textColor={"text-black"} headingLevel={1} />
             <figure className="absolute inset-0  -z-50 " style={{ width: "100vw", height: "100vh" }}>
                 <Canvas
                     shadows

@@ -2,7 +2,7 @@ import { useRef } from "react";
 import AnimatedTextLines from "../components/AnimatedTextLines";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-const AnimatedHeaderSection = ({ subtitle, title, text, textColor, withScrollTrigger = false }) => {
+const AnimatedHeaderSection = ({ subtitle, title, text, textColor, withScrollTrigger = false, headingLevel = 2 }) => {
     const contextRef = useRef(null);
     const headerRef = useRef(null);
 
@@ -29,15 +29,19 @@ const AnimatedHeaderSection = ({ subtitle, title, text, textColor, withScrollTri
             ease: 'back.out',
         }, "<")
     }, []);
+
+    const safeLevel = Math.min(6, Math.max(1, Number(headingLevel) || 2));
+    const HeadingTag = `h${safeLevel}`;
+
     return (
         <div ref={contextRef} >
             <div className="" style={{ clipPath: "polygon(0 0, 100% 0%, 100% 100%, 0% 100%)" }}>
                 <div ref={headerRef} className='flex flex-col justify-center gap-12 pt-16 sm:gap-16 '>
                     <p className={`text-sm font-light tracking-[0.5rem] uppercase px-10 ${textColor}`}>{subtitle}</p>
                     <div className="px-10">
-                        <h1 className={`uppercase ${textColor} banner-text-responsive leading-tight`}>
+                        <HeadingTag className={`uppercase ${textColor} banner-text-responsive leading-tight`}>
                             {title}
-                        </h1>
+                        </HeadingTag>
                     </div>
                 </div>
             </div>
