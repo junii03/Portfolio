@@ -7,8 +7,12 @@ import gsap from "gsap";
 const Contact = () => {
     const text = "Have a project, an idea, or just want to connect?\nMy inbox is always open. Let’s talk.";
     const items = [
-        "Just Imagine, I code", "Just Imagine, I code", "Just Imagine, I code", "Just Imagine, I code", "Just Imagine, I code"
-    ]
+        "Ideas to Reality",
+        "Code with Vision",
+        "Design the Future",
+        "Dream. Build. Grow.",
+    ];
+
 
     useGSAP(() => {
         gsap.from('.social-link', {
