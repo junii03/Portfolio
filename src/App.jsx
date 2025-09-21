@@ -20,9 +20,15 @@ const App = () => {
             setIsReady(true);
         }
     }, [progress])
+    // Fallback to ensure overlay never blocks crawlers or users with limited WebGL/JS capabilities
+    useEffect(() => {
+        const id = setTimeout(() => setIsReady(true), 2000);
+        return () => clearTimeout(id);
+    }, []);
+
     return (
         <ReactLenis root className='relative w-screen min-h-screen overflow-x-auto'>
-            {!isReady && <div className='fixed inset-0 z-[999] flex flex-col items-center justify-center bg-black text-white transition-opacity duration-700 font-light'>
+            {!isReady && <div className='fixed inset-0 z-[999] flex flex-col items-center justify-center bg-black text-white transition-opacity duration-700 font-light' role="status" aria-live="polite" aria-busy={!isReady}>
                 <p className='mb-4 text-xl tracking-widest animate-pulse'>
                     Loading {Math.floor(progress)}%
                 </p>
@@ -34,14 +40,16 @@ const App = () => {
             </div>}
             <div className={`${isReady ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`}>
                 <SpeedInsights />
-                <Navbar />
-                <Hero />
-                <ServiceSummary />
-                <Services />
-                <About />
-                <Works />
-                <ContactSummary />
-                <Contact />
+                <main id='main-content' role='main'>
+                    <Navbar />
+                    <Hero />
+                    <ServiceSummary />
+                    <Services />
+                    <About />
+                    <Works />
+                    <ContactSummary />
+                    <Contact />
+                </main>
             </div>
         </ReactLenis>
     )
