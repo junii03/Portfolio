@@ -126,16 +126,16 @@ const Works = () => {
                         ))}</div>
                         {/* mobile preview images */}
                         <div className='relative flex items-center justify-center px-10 md:hidden h-[400px]'>
-                            <img src={project.bgImage} alt={`${project.name}-bg-img`} className='object-cover w-full h-full rounded-md brightness-50' />
-                            <img src={project.image} alt={`${project.name}-mobile-img`} className=' absolute bg-center px-14 rounded-md' />
+                            <img src={project.bgImage} alt={`${project.name}-bg-img`} className='object-cover w-full h-full rounded-md brightness-50' loading='lazy' decoding='async' fetchpriority='low' />
+                            <img src={project.image} alt={`${project.name}-mobile-img`} className=' absolute bg-center px-14 rounded-md' loading='lazy' decoding='async' fetchpriority='low' />
                         </div>
                     </div>
                 ))}
                 {/* desktop floating preview */}
                 <div ref={previewRef} className='fixed -top-2/6  left-0 z-50 overflow-hidden border-8 border-black pointer-events-none w-[960px] md:block opacity-0  hidden rounded-2xl'>
-                    {currentIndex !== null && projects[currentIndex] && (<img src={projects[currentIndex].image} alt="preview " className='object-cover w-full h-full rounded-md  ' />)}
-
-
+                    {currentIndex !== null && projects[currentIndex] && (
+                        <img src={projects[currentIndex].image} alt={`${projects[currentIndex].name} preview`} className='object-cover w-full h-full rounded-md' loading='lazy' decoding='async' fetchpriority='low' />
+                    )}
                 </div>
             </div>
         </section>

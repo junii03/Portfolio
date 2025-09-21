@@ -41,7 +41,7 @@ const About = () => {
         <section id="about" className="min-h-screen bg-black rounded-b-4xl">
             <AnimatedHeaderSection subtitle={"Crafted with purpose, Engineered to perform"} title={"About"} text={text} textColor={"text-white"} withScrollTrigger={true} />
             <div className="flex flex-col gap-16 px-10 pb-16 text-xl font-light items-center justify-between tracking-wide lg:flex-row md:text-2xl lg:text-3xl text-white/60">
-                <img ref={imgRef} src="images/man.jpeg" alt="Man" className="w-md rounded-3xl" />
+                <img ref={imgRef} src="images/man.jpeg" alt="Portrait of Junaid Afzal" className="w-md rounded-3xl" loading="lazy" decoding="async" fetchPriority="low" />
                 <AnimatedTextLines text={aboutText} className={"w-full"} />
             </div>
         </section>

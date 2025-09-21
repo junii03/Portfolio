@@ -13,20 +13,49 @@
         content="Portfolio of Junaid Afzal, Software Engineer. Explore projects, skills, and contact information." />
     <meta name="keywords" content="Junaid Afzal, Software Engineer, Portfolio, Projects, Web Development" />
     <link rel="canonical" href="https://www.junaidafzal.dev/" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <link rel="me" href="https://github.com/junii03" />
+    <link rel="me" href="https://www.instagram.com/junii.03/" />
+    <link rel="me" href="https://www.linkedin.com/in/junaiddev/" />
+    <link rel="me" href="https://www.facebook.com/M.Junii.A/" />
+    <!-- Added: robots, author, theme-color, hreflang, content-language -->
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="author" content="Junaid Afzal" />
+    <meta name="theme-color" content="#e5e5e0" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+    <link rel="alternate" href="https://www.junaidafzal.dev/" hreflang="en" />
+    <meta http-equiv="Content-Language" content="en-US" />
+
+    <!-- Preloads for performance -->
+    <link rel="preload" href="/fonts/amiamie/otf/Amiamie-Regular.otf" as="font" type="font/otf" crossorigin>
+    <link rel="preload" href="/fonts/amiamie/otf/Amiamie-Black.otf" as="font" type="font/otf" crossorigin>
+    <link rel="preload" href="/models/Planet.glb" as="fetch" type="model/gltf-binary" crossorigin>
+
+    <!-- App icons & manifest -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/J.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/J.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/J.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Junaid Afzal - Software Engineer" />
     <meta property="og:description"
         content="Portfolio of Junaid Afzal, Software Engineer. Explore projects, skills, and contact information." />
     <meta property="og:image" content="https://www.junaidafzal.dev/J.png" />
+    <meta property="og:image:alt" content="Junaid Afzal portfolio logo" />
     <meta property="og:url" content="https://www.junaidafzal.dev/" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Junaid Afzal Portfolio" />
+    <meta property="og:locale" content="en_US" />
+
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Junaid Afzal - Software Engineer" />
     <meta name="twitter:description"
         content="Portfolio of Junaid Afzal, Software Engineer. Explore projects, skills, and contact information." />
     <meta name="twitter:image" content="https://www.junaidafzal.dev/J.png" />
+    <meta name="twitter:image:alt" content="Junaid Afzal portfolio logo" />
+
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -36,10 +65,30 @@
       "image": "https://www.junaidafzal.dev/J.png",
       "jobTitle": "Software Engineer",
       "sameAs": [
-        "https://www.linkedin.com/in/junaiddev",
+        "https://www.linkedin.com/in/junaiddev/",
         "https://www.instagram.com/junii.03/",
-        "https://github.com/junii03"
-      ]
+        "https://github.com/junii03",
+        "https://www.facebook.com/M.Junii.A/"
+      ],
+      "knowsAbout": [
+        "Flutter", "Dart", "React", "Next.js", "TailwindCSS", "Node.js", "REST APIs", "Firebase",
+        "Three.js", "GSAP", "Vite", "UI/UX", "Mobile App Development", "Web Performance"
+      ],
+      "email": "junaidafzal.dev@gmail.com",
+      "telephone": "+923038455524",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Lahore",
+        "addressCountry": "PK"
+      },
+      "contactPoint": [{
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "telephone": "+923038455524",
+        "email": "junaidafzal.dev@gmail.com",
+        "areaServed": "PK",
+        "availableLanguage": ["en"]
+      }]
     }
     </script>
     <script type="application/ld+json">
@@ -47,7 +96,8 @@
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "Junaid Afzal Portfolio",
-      "url": "https://www.junaidafzal.dev/"
+      "url": "https://www.junaidafzal.dev/",
+      "inLanguage": "en-US"
     }
     </script>
     <script type="application/ld+json">
@@ -120,6 +170,18 @@
 
 <body>
     <div id="root"></div>
+    <!-- Noscript fallback to ensure visible content for non-JS environments and crawlers -->
+    <noscript>
+        <div
+            style="padding:16px; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;">
+            <h1>Junaid Afzal – Software Engineer</h1>
+            <p>Building scalable apps across mobile and web. Explore projects and contact information at
+                <a href="https://www.junaidafzal.dev/">junaidafzal.dev</a>.
+            </p>
+            <img src="/images/man.png" alt="Portrait of Junaid Afzal"
+                style="max-width:320px; height:auto; border-radius:16px;" />
+        </div>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
 </body>
 
