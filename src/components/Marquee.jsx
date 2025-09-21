@@ -28,6 +28,9 @@ export default function Marquee({
     const quickSetterRef = useRef(null);
     const roRef = useRef(null);
     const observerRef = useRef(null);
+    // visibility & reduced-motion
+    const visibleRef = useRef(true);
+    const prefersReducedMotionRef = useRef(false);
 
     // helper to build one set of items
     const buildSingleSet = (keyBase = "") => (
@@ -121,6 +124,65 @@ export default function Marquee({
         };
     }, [initTicker, reverse, speed]);
 
+    // Pause when not in viewport using IntersectionObserver
+    useEffect(() => {
+        const el = containerRef.current;
+        if (!el || typeof IntersectionObserver === "undefined") return;
+        const io = new IntersectionObserver((entries) => {
+            const entry = entries[0];
+            const isVisible = !!entry?.isIntersecting;
+            visibleRef.current = isVisible;
+            // only run when visible and tab is active and not preferring reduced motion
+            const shouldRun = isVisible && !document.hidden && !prefersReducedMotionRef.current;
+            runningRef.current = shouldRun;
+            if (shouldRun) lastTimeRef.current = performance.now();
+        }, { threshold: 0.01 });
+        io.observe(el);
+        return () => {
+            try { io.disconnect(); } catch (e) { if (import.meta?.env?.DEV) console.debug(e); }
+        };
+    }, []);
+
+    // Pause when tab is hidden (Page Visibility API)
+    useEffect(() => {
+        const onVis = () => {
+            const active = !document.hidden && visibleRef.current && !prefersReducedMotionRef.current;
+            runningRef.current = active;
+            if (active) lastTimeRef.current = performance.now();
+        };
+        document.addEventListener("visibilitychange", onVis);
+        return () => document.removeEventListener("visibilitychange", onVis);
+    }, []);
+
+    // Respect prefers-reduced-motion
+    useEffect(() => {
+        if (typeof window === "undefined" || !window.matchMedia) return;
+        const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+        const apply = () => {
+            prefersReducedMotionRef.current = mq.matches;
+            if (mq.matches) {
+                // stop and reset position for users preferring reduced motion
+                runningRef.current = false;
+                speedObjRef.current.v = 0;
+                posRef.current = 0;
+                if (quickSetterRef.current) quickSetterRef.current(0);
+            } else {
+                speedObjRef.current.v = 1;
+                runningRef.current = visibleRef.current && !document.hidden;
+                lastTimeRef.current = performance.now();
+            }
+        };
+        apply();
+        try {
+            mq.addEventListener("change", apply);
+            return () => mq.removeEventListener("change", apply);
+        } catch {
+            // Safari fallback
+            mq.addListener(apply);
+            return () => mq.removeListener(apply);
+        }
+    }, []);
+
     // ResizeObserver/resize listener to recompute copies and re-init ticker
     useEffect(() => {
         computeCopies();
@@ -153,9 +215,7 @@ export default function Marquee({
 
         return () => {
             if (roRef.current) {
-                try { roRef.current.disconnect(); } catch (e) {
-                    console.log(e);
-                }
+                try { roRef.current.disconnect(); } catch (e) { console.log(e); }
             }
         };
     }, [computeCopies, initTicker]);
@@ -164,6 +224,8 @@ export default function Marquee({
     useEffect(() => {
         observerRef.current = Observer.create({
             onChangeY(self) {
+                // ignore if not visible or motion reduced
+                if (!visibleRef.current || prefersReducedMotionRef.current) return;
                 // choose a multiplier; can be negative to reverse briefly
                 let factor = 1.8;
                 if ((!reverse && self.deltaY < 0) || (reverse && self.deltaY > 0)) factor *= -1;
@@ -189,7 +251,8 @@ export default function Marquee({
     const handleMouseEnter = () => (runningRef.current = false);
     const handleMouseLeave = () => {
         // resume and reset time baseline to avoid big dt spike
-        runningRef.current = true;
+        const shouldRun = visibleRef.current && !document.hidden && !prefersReducedMotionRef.current;
+        runningRef.current = shouldRun;
         lastTimeRef.current = performance.now();
     };
 

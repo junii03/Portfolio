@@ -3,6 +3,9 @@ import { useGLTF } from '@react-three/drei'
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 
+// Preload the model at module load time for faster first paint
+useGLTF.preload('/models/Planet.glb');
+
 export function Planet(props) {
     const { nodes, materials } = useGLTF('/models/Planet.glb');
     const shapeContainer = useRef(null);
@@ -10,22 +13,20 @@ export function Planet(props) {
     const ringContainer = useRef(null);
 
     useGSAP(() => {
-
-
         const tl = gsap.timeline();
-        tl.from(shapeContainer.current.position, {
+        tl.from(shapeContainer.current?.position, {
             y: 5,
             duration: 3,
             ease: 'circ.out',
         });
-        tl.from(spheresContainer.current.rotation, {
+        tl.from(spheresContainer.current?.rotation, {
             x: 0,
             y: Math.PI,
             z: -Math.PI,
             duration: 10,
             ease: 'power1.inOut',
         }, "-=25%");
-        tl.from(ringContainer.current.rotation, {
+        tl.from(ringContainer.current?.rotation, {
             x: 0.8,
             y: 0,
             z: 0,
