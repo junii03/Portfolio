@@ -19,15 +19,26 @@ const Hero = () => {
     const [sceneReady, setSceneReady] = useState(false);
     const [mountScene, setMountScene] = useState(false);
 
-    // Defer the heavy 3D chunk until the browser is idle, so text paints first.
+    // The 3D scene is decorative: start it only after the page has loaded and the
+    // first paint (LCP text) is done, and skip it on constrained devices.
     useEffect(() => {
-        const start = () => setMountScene(true);
-        if ('requestIdleCallback' in window) {
-            const id = window.requestIdleCallback(start, { timeout: 1200 });
-            return () => window.cancelIdleCallback(id);
-        }
-        const id = setTimeout(start, 300);
-        return () => clearTimeout(id);
+        const nav = navigator;
+        const lowEnd =
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+            nav.connection?.saveData ||
+            (nav.deviceMemory && nav.deviceMemory <= 2) ||
+            (nav.hardwareConcurrency && nav.hardwareConcurrency <= 2);
+        if (lowEnd) return;
+        let timer;
+        const start = () => {
+            timer = setTimeout(() => setMountScene(true), 1800);
+        };
+        if (document.readyState === 'complete') start();
+        else window.addEventListener('load', start, { once: true });
+        return () => {
+            clearTimeout(timer);
+            window.removeEventListener('load', start);
+        };
     }, []);
 
     useEffect(() => {
@@ -70,6 +81,7 @@ const Hero = () => {
                 text={hero.text}
                 textColor="text-black"
                 headingLevel={1}
+                fast
             />
             <div ref={ctaRef} className="flex flex-wrap items-center gap-3 px-10 pb-10 -mt-6 sm:-mt-4 sm:pb-12">
                 <a href="#work" className={`${ctaBase} bg-black text-white hover:bg-DarkLava`}>

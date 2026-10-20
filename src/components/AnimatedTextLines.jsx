@@ -5,7 +5,7 @@ import { useRef } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const AnimatedTextLines = ({ text, className }) => {
+const AnimatedTextLines = ({ text, className, stagger = 0.3, duration = 1 }) => {
     const lines = text.split('\n').filter(line => line.trim() !== '');
     const containerRef = useRef(null);
     const linesRef = useRef([]);
@@ -16,8 +16,8 @@ const AnimatedTextLines = ({ text, className }) => {
             gsap.from(linesRef.current, {
                 y: 100,
                 opacity: 0,
-                duration: 1,
-                stagger: 0.3,
+                duration,
+                stagger,
                 ease: 'back.out',
                 scrollTrigger: {
                     trigger: containerRef.current,

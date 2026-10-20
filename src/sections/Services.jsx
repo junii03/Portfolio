@@ -59,7 +59,7 @@ const Services = () => {
                                 {service.items.map((item, itemIndex) => (
                                     <div key={`item-${index}-${itemIndex}`}>
                                         <h4 className="flex items-baseline">
-                                            <span className="mr-12 text-lg text-white/30">0{itemIndex + 1}</span>
+                                            <span className="mr-12 text-lg text-white/55">0{itemIndex + 1}</span>
                                             {item.title}
                                             <span className="ml-4 hidden text-base text-white/40 md:inline">{item.description}</span>
                                         </h4>

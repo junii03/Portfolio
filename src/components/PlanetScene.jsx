@@ -6,7 +6,7 @@ import { Planet } from './Planet';
 const PlanetScene = ({ running, isMobile, onReady }) => (
     <Canvas
         frameloop={running ? 'always' : 'never'}
-        dpr={[1, 1.5]}
+        dpr={isMobile ? [1, 1] : [1, 1.5]}
         gl={{ antialias: false, powerPreference: 'high-performance' }}
         camera={{ position: [0, 0, -10], fov: 17.5, near: 1, far: 20 }}
         onCreated={onReady}

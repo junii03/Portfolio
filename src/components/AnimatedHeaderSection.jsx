@@ -2,7 +2,8 @@ import { useRef } from "react";
 import AnimatedTextLines from "../components/AnimatedTextLines";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-const AnimatedHeaderSection = ({ subtitle, title, text, textColor, withScrollTrigger = false, headingLevel = 2 }) => {
+const AnimatedHeaderSection = ({ subtitle, title, text, textColor, withScrollTrigger = false, headingLevel = 2, fast = false }) => {
+    const d = fast ? 0.6 : 1;
     const contextRef = useRef(null);
     const headerRef = useRef(null);
 
@@ -14,18 +15,18 @@ const AnimatedHeaderSection = ({ subtitle, title, text, textColor, withScrollTri
         });
         tl.from(contextRef.current, {
             y: "50vh",
-            duration: 1,
+            duration: d,
             ease: 'circ.out',
         })
         tl.from(headerRef.current, {
             y: 200,
             opacity: 0,
-            duration: 1,
+            duration: d,
             ease: 'circ.out',
         }, "<+0.2")
         tl.from(contextRef.current, {
             scale: 0.8,
-            duration: 1,
+            duration: d,
             ease: 'back.out',
         }, "<")
     }, []);
@@ -48,7 +49,7 @@ const AnimatedHeaderSection = ({ subtitle, title, text, textColor, withScrollTri
             <div className={`relative px-10 ${textColor}`}>
                 <div className="absolute inset-x-0 border-t-2" />
                 <div className="py-12 sm:py-16 text-end">
-                    <AnimatedTextLines text={text} className={`font-light uppercase value-text-responsive ${textColor}`} />
+                    <AnimatedTextLines text={text} className={`font-light uppercase value-text-responsive ${textColor}`} stagger={fast ? 0.1 : 0.3} duration={d} />
 
 
                 </div>

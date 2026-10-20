@@ -46,6 +46,7 @@
     --color-DarkLava: #393632;
     --color-SageGray: #8b8b73;
     --color-gold: #cfa355;
+    --color-gold-deep: #8a6118; /* gold for text on the light background (AA for large text) */
     --font-amiamie: "Amiamie", sans-serif;
 
     --animate-marquee: marquee 40s infinite linear;

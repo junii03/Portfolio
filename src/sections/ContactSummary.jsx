@@ -54,7 +54,7 @@ const ContactSummary = () => {
                 <p>"Let's build a <br />
                     <span className="font-normal">memorable</span> &{" "}
                     <span className="italic">inspiring</span> <br />
-                    product <span className="text-gold">together</span>"
+                    product <span className="text-gold-deep">together</span>"
                 </p>
             </div>
             {/* marquee */}
