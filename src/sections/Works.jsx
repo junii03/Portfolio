@@ -2,14 +2,16 @@ import { useRef, useState } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import AnimatedHeaderSection from '../components/AnimatedHeaderSection';
-import ProjectPreview from '../components/ProjectPreview';
 import { ArrowUpRight } from '../components/Icons';
-import { projects, worksIntro } from '../constants';
+import { projects, worksIntro, socials } from '../constants';
 
-const isDesktop = () => window.innerWidth >= 768;
+const PREVIEW_W = 340;
+const PREVIEW_H = 200;
+const isDesktop = () => window.innerWidth >= 1024;
+const pad = (n) => String(n).padStart(2, '0');
 
 const Works = () => {
-    const [currentIndex, setCurrentIndex] = useState(null);
+    const [active, setActive] = useState(null);
     const listRef = useRef(null);
     const previewRef = useRef(null);
     const moveX = useRef(null);
@@ -17,66 +19,59 @@ const Works = () => {
     const overlayRef = useRef([]);
 
     useGSAP(() => {
-        moveX.current = gsap.quickTo(previewRef.current, 'x', { duration: 1.5, ease: 'power3.out' });
-        moveY.current = gsap.quickTo(previewRef.current, 'y', { duration: 2, ease: 'power3.out' });
+        moveX.current = gsap.quickTo(previewRef.current, 'x', { duration: 0.6, ease: 'power3.out' });
+        moveY.current = gsap.quickTo(previewRef.current, 'y', { duration: 0.6, ease: 'power3.out' });
 
         gsap.from('.project-row', {
-            y: 80,
+            y: 60,
             autoAlpha: 0,
-            stagger: 0.12,
+            stagger: 0.1,
             duration: 0.9,
             ease: 'power3.out',
             scrollTrigger: { trigger: listRef.current, start: 'top 85%' },
         });
     }, []);
 
+    // Keep the small preview inside the viewport, to the lower-right of the pointer
+    const follow = (x, y) => {
+        moveX.current(Math.min(x + 28, window.innerWidth - PREVIEW_W - 24));
+        moveY.current(Math.min(y + 28, window.innerHeight - PREVIEW_H - 24));
+    };
+
     const show = (index, point) => {
         if (!isDesktop()) return;
-        setCurrentIndex(index);
-        if (point) {
-            moveX.current(point.x);
-            moveY.current(point.y);
-        }
+        setActive(index);
+        if (point) follow(point.x, point.y);
         const overlay = overlayRef.current[index];
         if (overlay) {
             gsap.killTweensOf(overlay);
-            gsap.fromTo(
-                overlay,
-                { clipPath: 'polygon(0 100%, 100% 100%, 100% 100%, 0 100%)' },
-                { clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)', duration: 0.15, ease: 'power2.out' },
-            );
+            gsap.to(overlay, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.35, ease: 'power3.out' });
         }
-        gsap.to(previewRef.current, { opacity: 1, scale: 1, duration: 0.3, ease: 'power2.out' });
+        if (projects[index].image) {
+            gsap.to(previewRef.current, { autoAlpha: 1, scale: 1, duration: 0.25, ease: 'power2.out' });
+        }
     };
 
     const hide = (index) => {
         if (!isDesktop()) return;
-        setCurrentIndex(null);
+        setActive(null);
         const overlay = overlayRef.current[index];
         if (overlay) {
             gsap.killTweensOf(overlay);
-            gsap.to(overlay, {
-                clipPath: 'polygon(0 100%, 100% 100%, 100% 100%, 0 100%)',
-                duration: 0.15,
-                ease: 'power2.out',
-            });
+            gsap.to(overlay, { clipPath: 'inset(100% 0% 0% 0%)', duration: 0.3, ease: 'power3.inOut' });
         }
-        gsap.to(previewRef.current, { opacity: 0, scale: 0.5, duration: 0.3, ease: 'power2.out' });
+        gsap.to(previewRef.current, { autoAlpha: 0, scale: 0.92, duration: 0.2, ease: 'power2.in' });
     };
 
-    const handleMouseMove = (e) => {
-        if (!isDesktop()) return;
-        moveX.current(e.clientX + 24);
-        moveY.current(e.clientY + 24);
+    const onMouseMove = (e) => {
+        if (isDesktop()) follow(e.clientX, e.clientY);
     };
 
-    // Keyboard users get the same preview, anchored next to the focused row
-    const handleFocus = (index, e) => {
+    // Keyboard users get the same preview, anchored beside the focused row
+    const onFocus = (index, e) => {
         const r = e.currentTarget.getBoundingClientRect();
-        show(index, { x: Math.max(24, r.right - 600), y: Math.max(24, r.top - 120) });
+        show(index, { x: r.right - PREVIEW_W - 120, y: r.top });
     };
-
-    const active = currentIndex !== null ? projects[currentIndex] : null;
 
     return (
         <section id="work" className="flex flex-col min-h-screen">
@@ -87,7 +82,7 @@ const Works = () => {
                 textColor="text-black"
                 withScrollTrigger={true}
             />
-            <ul ref={listRef} className="relative flex flex-col font-light" onMouseMove={handleMouseMove}>
+            <ul ref={listRef} className="relative flex flex-col border-t border-black/80 font-light" onMouseMove={onMouseMove}>
                 {projects.map((project, index) => {
                     const Tag = project.href ? 'a' : 'div';
                     const linkProps = project.href
@@ -99,79 +94,102 @@ const Works = () => {
                         }
                         : {};
                     return (
-                        <li key={project.id} className="project-row">
+                        <li key={project.id} className="project-row border-b border-black/80">
                             <Tag
                                 {...linkProps}
-                                className={`relative flex flex-col gap-1 py-5 group md:gap-0 ${project.href ? 'cursor-pointer' : ''}`}
+                                className="group relative grid gap-4 px-10 py-8 lg:grid-cols-[3rem_minmax(0,1.3fr)_minmax(0,1.6fr)_minmax(0,1fr)_3rem] lg:items-center lg:gap-8 lg:py-10"
                                 onMouseEnter={() => show(index)}
                                 onMouseLeave={() => hide(index)}
-                                onFocus={project.href ? (e) => handleFocus(index, e) : undefined}
+                                onFocus={project.href ? (e) => onFocus(index, e) : undefined}
                                 onBlur={project.href ? () => hide(index) : undefined}
                             >
-                                {/* hover overlay */}
                                 <div
                                     aria-hidden="true"
-                                    className="absolute inset-0 hidden md:block duration-200 bg-gradient-to-r from-black/90 via-black/70 to-black/90 -z-10 clip-path"
+                                    className="absolute inset-0 hidden bg-black -z-10 lg:block"
+                                    style={{ clipPath: 'inset(100% 0% 0% 0%)' }}
                                     ref={(el) => { overlayRef.current[index] = el; }}
                                 />
-                                <div className="flex flex-col px-10 text-black transition-all duration-500 md:group-hover:px-12 md:group-hover:text-white md:group-focus-visible:px-12 md:group-focus-visible:text-white">
-                                    <p className="mb-2 text-[11px] uppercase tracking-[0.3em] text-black/50 transition-colors duration-500 md:group-hover:text-white/60">
+
+                                <span className="hidden text-sm tracking-[0.2em] text-black/40 transition-colors duration-300 lg:block lg:group-hover:text-white/50">
+                                    {pad(index + 1)}
+                                </span>
+
+                                <div className="transition-colors duration-300 lg:group-hover:text-white">
+                                    <h3 className="text-3xl leading-tight lg:text-[40px]">{project.name}</h3>
+                                    <p className="mt-2 text-[11px] uppercase tracking-[0.25em] text-black/50 transition-colors duration-300 lg:group-hover:text-white/60">
                                         {project.kind}
                                     </p>
-                                    <div className="flex items-center justify-between">
-                                        <h3 className="lg:text-[32px] text-[26px] leading-none">{project.name}</h3>
-                                        {project.href && (
-                                            <ArrowUpRight className="md:size-6 size-5 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
-                                        )}
-                                    </div>
-                                    <p className="mt-2 max-w-4xl text-sm md:text-base text-black/70 transition-colors duration-500 md:group-hover:text-white/80">
-                                        {project.description}
-                                    </p>
                                 </div>
-                                <div className="w-full h-0.5 mt-3 bg-black/80" />
-                                <ul className="flex flex-wrap px-10 text-xs leading-loose transition-all duration-500 md:text-sm gap-x-5 md:group-hover:px-12">
+
+                                <p className="max-w-xl text-sm leading-relaxed text-black/70 transition-colors duration-300 md:text-base lg:group-hover:text-white/75">
+                                    {project.description}
+                                </p>
+
+                                <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs tracking-wide text-black/80 transition-colors duration-300 md:text-sm lg:group-hover:text-white/90" aria-label="Technologies">
                                     {project.frameworks.map((fw) => (
-                                        <li key={fw} className="text-black transition-colors duration-500 md:group-hover:text-white">
-                                            {fw}
-                                        </li>
+                                        <li key={fw}>{fw}</li>
                                     ))}
                                 </ul>
-                                {/* mobile preview */}
-                                <div className="relative flex items-center justify-center px-10 mt-3 md:hidden">
-                                    {project.image ? (
-                                        <div className="relative w-full overflow-hidden rounded-md">
-                                            <img
-                                                src={project.bgImage}
-                                                alt=""
-                                                width="1200"
-                                                height="800"
-                                                className="object-cover w-full h-[260px] brightness-50"
-                                                loading="lazy"
-                                                decoding="async"
-                                            />
-                                            <ProjectPreview
-                                                project={project}
-                                                className="absolute inset-0 m-auto w-[82%] rounded-md shadow-xl"
-                                            />
-                                        </div>
-                                    ) : (
-                                        <ProjectPreview project={project} className="w-full rounded-md" />
-                                    )}
-                                </div>
+
+                                <span
+                                    aria-hidden="true"
+                                    className={`hidden size-11 place-items-center justify-self-end rounded-full border border-black/30 transition-all duration-300 lg:grid ${project.href ? 'lg:group-hover:border-gold lg:group-hover:bg-gold lg:group-hover:text-black lg:group-hover:rotate-45' : 'opacity-0'}`}
+                                >
+                                    <ArrowUpRight className="size-5" />
+                                </span>
+
+                                {/* mobile / tablet: small inline thumbnail, only when we have a screenshot */}
+                                {project.image && (
+                                    <img
+                                        src={project.image}
+                                        alt={`${project.name} screenshot`}
+                                        width={project.imageSize?.[0] ?? 1600}
+                                        height={project.imageSize?.[1] ?? 900}
+                                        className="mt-2 aspect-video w-full max-w-md rounded-lg object-cover object-top lg:hidden"
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
+                                )}
                             </Tag>
                         </li>
                     );
                 })}
             </ul>
 
-            {/* desktop floating preview */}
+            <div className="flex items-center justify-between px-10 py-10 text-sm tracking-[0.2em] uppercase">
+                <span className="text-black/50">More on GitHub</span>
+                <a
+                    href={socials.find((s) => s.name === 'GitHub')?.href}
+                    target="_blank"
+                    rel="me noopener noreferrer"
+                    className="inline-flex items-center gap-2 transition-colors hover:text-gold"
+                >
+                    github.com/junii03 <ArrowUpRight className="size-4" />
+                </a>
+            </div>
+
+            {/* desktop cursor-following preview: compact, screenshot-only */}
             <div
                 ref={previewRef}
                 aria-hidden="true"
-                className="fixed top-0 left-0 z-50 hidden overflow-hidden border-8 border-black pointer-events-none opacity-0 md:block w-[min(960px,60vw)] rounded-2xl bg-black"
-                style={{ marginTop: '-18vh' }}
+                className="pointer-events-none fixed left-0 top-0 z-50 hidden overflow-hidden rounded-xl bg-black shadow-2xl ring-1 ring-black/10 lg:block"
+                style={{ width: PREVIEW_W, height: PREVIEW_H, opacity: 0, visibility: 'hidden' }}
             >
-                {active && <ProjectPreview project={active} className="object-cover w-full h-auto" eager />}
+                {projects.map((p, i) =>
+                    p.image ? (
+                        <img
+                            key={p.id}
+                            src={p.image}
+                            alt=""
+                            width={p.imageSize?.[0] ?? 1600}
+                            height={p.imageSize?.[1] ?? 900}
+                            className="absolute inset-0 h-full w-full object-cover object-top transition-opacity duration-200"
+                            style={{ opacity: active === i ? 1 : 0 }}
+                            loading="lazy"
+                            decoding="async"
+                        />
+                    ) : null,
+                )}
             </div>
         </section>
     );

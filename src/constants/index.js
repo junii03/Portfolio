@@ -161,7 +161,7 @@ export const worksIntro = {
 };
 
 // `href` is optional — rows without one render as non-clickable (employer / academic work).
-// `image` / `bgImage` are optional — rows without them get a generated typographic preview.
+// `image` is optional — rows without one simply show no hover preview.
 export const projects = [
     {
         id: 1,
@@ -171,7 +171,6 @@ export const projects = [
             'Global student-placement app live on the Play Store across 60+ countries — fully modernized to the latest Flutter (all breaking deprecations resolved), plus an AI interview grader (Whisper + GPT-4o) and a RAG chatbot that recommends institutions.',
         href: 'https://play.google.com/store/apps/details?id=com.oner.education',
         frameworks: ['Flutter', 'Firebase', 'GPT-4o', 'Whisper', 'RAG'],
-        accent: '#cfa355',
     },
     {
         id: 2,
@@ -180,7 +179,6 @@ export const projects = [
         description:
             'Three NestJS microservices on MongoDB: a weight-based post recommendation algorithm, a full ads pipeline and a guest flow — shipped with GitHub Actions CI/CD.',
         frameworks: ['NestJS', 'MongoDB', 'Microservices', 'GitHub Actions'],
-        accent: '#8b8b73',
     },
     {
         id: 3,
@@ -190,7 +188,6 @@ export const projects = [
             'Farmer-to-consumer marketplace backed by a Hyperledger Fabric ledger, with AI modules — plus market research, competitor and SWOT analysis behind its go-to-market strategy, pricing and positioning.',
         href: 'https://github.com/Farm2Fork-Project',
         frameworks: ['Hyperledger Fabric', 'AI / ML', 'Marketplace'],
-        accent: '#6aa84f',
     },
     {
         id: 4,
@@ -200,7 +197,6 @@ export const projects = [
             'Full-stack banking platform: NestJS API with Redis caching, JWT auth and WebSocket notifications, shared by a React dashboard and a React Native app — all REST APIs documented and tested via Swagger.',
         href: 'https://github.com/junii03/Advance-Web-Programming/tree/main/Project',
         frameworks: ['NestJS', 'Redis', 'JWT', 'WebSockets', 'React', 'React Native'],
-        accent: '#4a90d9',
     },
     {
         id: 5,
@@ -210,7 +206,6 @@ export const projects = [
             'A sleek online fragrance store with a user-friendly interface and an integrated admin panel.',
         href: 'https://zakisessence.pk/',
         image: '/assets/projects/scents-store.webp',
-        bgImage: '/assets/backgrounds/scents-background.webp',
         imageSize: [1600, 928],
         frameworks: ['React', 'Firebase', 'Tailwind CSS'],
     },
@@ -222,7 +217,6 @@ export const projects = [
             'A full-stack online banking app featuring intuitive UI and secure transactions.',
         href: 'https://github.com/junii03/Web-Engineering/tree/7fb9cdfccb73c08263b159a50482014f3856305c/WAD/Project',
         image: '/assets/projects/hbl-clone.webp',
-        bgImage: '/assets/backgrounds/hbl.webp',
         imageSize: [1600, 1000],
         frameworks: ['React', 'Node.js', 'MongoDB', 'Tailwind CSS', 'Redis'],
     },
@@ -234,7 +228,6 @@ export const projects = [
             'A mobile app for hassle-free package delivery — track, manage and deliver with ease.',
         href: 'https://play.google.com/store/apps/details?id=com.shippacks.app&pli=1',
         image: '/assets/projects/shippacks.webp',
-        bgImage: '/assets/backgrounds/delivery.webp',
         imageSize: [1600, 900],
         frameworks: ['Flutter', 'Firebase', 'FCM', 'Google Maps'],
     },
@@ -246,7 +239,6 @@ export const projects = [
             'A global platform connecting seafarers and shipping entities with real-time communication and community tools.',
         href: 'https://play.google.com/store/apps/details?id=com.marinoft.connecting_seafarer',
         image: '/assets/projects/connecting-seafarer.webp',
-        bgImage: '/assets/backgrounds/seafarer.webp',
         imageSize: [1600, 900],
         frameworks: ['Flutter', 'WebSockets', 'FCM'],
     },
