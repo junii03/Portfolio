@@ -1,6 +1,12 @@
-// Case-study pages (/projects/<slug>/). Rendered as static, zero-JS HTML by
-// vite-plugins/seo.js. Every fact below comes from the résumé — add real
-// challenges, decisions and results here to make each page richer.
+// Case-study pages (/projects/<slug>/). Rendered as static HTML by
+// vite-plugins/seo.js. Facts come from the résumé and the project repositories —
+// add real challenges, decisions and results here to make each page richer.
+//
+// Shape:
+//   highlights  — big-number callouts under the hero
+//   diagram     — { type: 'flow' | 'tiles', title, items: [{ label, sub? }] }
+//   sections    — { heading, paragraphs?, bullets?: [{ title, text }] }
+//   image       — optional screenshot shown in a browser frame (+ imageSize)
 
 export const caseStudies = [
     {
@@ -20,6 +26,21 @@ export const caseStudies = [
         links: [
             { label: 'View on Google Play', href: 'https://play.google.com/store/apps/details?id=com.oner.education' },
         ],
+        highlights: [
+            { value: '60+', label: 'Countries served' },
+            { value: '3', label: 'Interview types: job, scholarship, IELTS' },
+            { value: '2', label: 'AI features, built solo' },
+        ],
+        diagram: {
+            type: 'flow',
+            title: 'The AI interview pipeline',
+            items: [
+                { label: 'Record', sub: 'Job · scholarship · IELTS interview audio' },
+                { label: 'Transcribe', sub: 'Whisper STT' },
+                { label: 'Grade', sub: 'GPT-4o — scores, summaries, improvement suggestions' },
+                { label: 'Report', sub: 'Structured report for the user' },
+            ],
+        },
         sections: [
             {
                 heading: 'Overview',
@@ -36,9 +57,18 @@ export const caseStudies = [
             {
                 heading: 'What I built',
                 bullets: [
-                    'Full Flutter modernization — upgraded the app from a severely outdated version to the latest Flutter/Dart, resolved every breaking deprecation across the entire app, and restored full platform compatibility.',
-                    'AI interview assessment for job, scholarship and IELTS interviews: the app records the user’s audio, transcribes it with Whisper STT, grades the answers with GPT-4o (scores, summaries and improvement suggestions) and generates a structured report. The pipeline runs on Firebase Cloud Functions and Flutter, and I was the sole developer.',
-                    'A RAG-based institution-recommendation chatbot: Firestore-grounded retrieval through Cloud Functions that matches each user to programs based on their academic profile.',
+                    {
+                        title: 'Full Flutter modernization',
+                        text: 'Upgraded the app from a severely outdated version to the latest Flutter/Dart, resolved every breaking deprecation across the entire app, and restored full platform compatibility.',
+                    },
+                    {
+                        title: 'AI interview assessment',
+                        text: 'For job, scholarship and IELTS interviews: the app records the user’s audio, transcribes it with Whisper STT, grades the answers with GPT-4o (scores, summaries and improvement suggestions) and generates a structured report. The pipeline runs on Firebase Cloud Functions and Flutter, and I was the sole developer.',
+                    },
+                    {
+                        title: 'RAG recommendation chatbot',
+                        text: 'Firestore-grounded retrieval through Cloud Functions that matches each user to programs based on their academic profile.',
+                    },
                 ],
             },
             {
@@ -64,6 +94,21 @@ export const caseStudies = [
         stack: ['NestJS', 'Node.js', 'MongoDB', 'REST APIs', 'Microservices', 'GitHub Actions'],
         keywords: ['NestJS microservices', 'recommendation algorithm', 'ads pipeline', 'MongoDB', 'REST API design'],
         links: [],
+        highlights: [
+            { value: '3', label: 'NestJS microservices' },
+            { value: '15+', label: 'REST endpoints from scratch' },
+            { value: '5–8', label: 'Person teams led' },
+        ],
+        diagram: {
+            type: 'tiles',
+            title: 'Service map',
+            items: [
+                { label: 'Main backend', sub: 'NestJS microservice' },
+                { label: 'Gift wallet system', sub: 'NestJS microservice' },
+                { label: 'User verification', sub: 'NestJS microservice' },
+                { label: 'MongoDB', sub: 'Data layer' },
+            ],
+        },
         sections: [
             {
                 heading: 'Overview',
@@ -80,10 +125,22 @@ export const caseStudies = [
             {
                 heading: 'What I built',
                 bullets: [
-                    'A weight-based post recommendation algorithm that ranks content for each user — core to the platform’s retention.',
-                    'A complete ads pipeline covering targeting, delivery and impression tracking — core to monetization.',
-                    'A guest-user flow that gives unauthenticated users access to the app, improving top-of-funnel acquisition.',
-                    'GitHub Actions CI/CD for automated backend deployment and mobile builds.',
+                    {
+                        title: 'Recommendation algorithm',
+                        text: 'A weight-based post recommendation algorithm that ranks content for each user — core to the platform’s retention.',
+                    },
+                    {
+                        title: 'Ads pipeline',
+                        text: 'A complete pipeline covering targeting, delivery and impression tracking — core to monetization.',
+                    },
+                    {
+                        title: 'Guest flow',
+                        text: 'A guest-user flow that gives unauthenticated users access to the app, improving top-of-funnel acquisition.',
+                    },
+                    {
+                        title: 'CI/CD',
+                        text: 'GitHub Actions for automated backend deployment and mobile builds.',
+                    },
                 ],
             },
             {
@@ -121,6 +178,22 @@ export const caseStudies = [
         ],
         keywords: ['Hyperledger Fabric', 'agri marketplace', 'crop quality grading', 'NestJS', 'Flutter', 'final year project'],
         links: [{ label: 'View on GitHub', href: 'https://github.com/Farm2Fork-Project' }],
+        highlights: [
+            { value: '5', label: 'Repositories: web, backend, mobile, blockchain, AI' },
+            { value: '4', label: 'Crops graded: wheat, rice, mango, maize' },
+            { value: 'A–D', label: 'Quality grade scale' },
+        ],
+        diagram: {
+            type: 'tiles',
+            title: 'System map',
+            items: [
+                { label: 'Web', sub: 'Next.js · TypeScript' },
+                { label: 'Backend', sub: 'NestJS · MongoDB · Redis' },
+                { label: 'Mobile', sub: 'Flutter · Google Maps · FCM' },
+                { label: 'Blockchain', sub: 'Hyperledger Fabric · Go chaincode' },
+                { label: 'AI', sub: 'FastAPI · EfficientNet-B0' },
+            ],
+        },
         sections: [
             {
                 heading: 'Overview',
@@ -131,11 +204,26 @@ export const caseStudies = [
             {
                 heading: 'How it is built',
                 bullets: [
-                    'Backend — a NestJS API on MongoDB and Redis with Firebase authentication, Swagger documentation, Docker Compose to run the whole stack locally, and end-to-end tests covering the payment and shipment flows.',
-                    'Web — a Next.js app with separate routes for buyers, farmers and transporters, Firebase sign-in (including Google) and credentialed, HTTP-only backend sessions protected by a CSRF header.',
-                    'Mobile — a Flutter app with Google Maps for farm pins, the checkout drop-off pin and transporter maps; transporters share location only while online with the app open, and Firebase Cloud Messaging delivers push notifications.',
-                    'Blockchain — a Hyperledger Fabric network with Go chaincode that records payments (Stripe, JazzCash, Safepay) and supply-chain events such as listed, assigned, picked up, in transit and delivered. Writes are validated and idempotent, and the ledger can be queried by ledger key, reference or product.',
-                    'AI — a FastAPI inference service that suggests an A–D quality grade from a photo of wheat, rice, mango or maize (EfficientNet-B0) for the farmer to confirm, plus a rule-based price-range estimate in PKR per unit.',
+                    {
+                        title: 'Backend',
+                        text: 'A NestJS API on MongoDB and Redis with Firebase authentication, Swagger documentation, Docker Compose to run the whole stack locally, and end-to-end tests covering the payment and shipment flows.',
+                    },
+                    {
+                        title: 'Web',
+                        text: 'A Next.js app with separate routes for buyers, farmers and transporters, Firebase sign-in (including Google) and credentialed, HTTP-only backend sessions protected by a CSRF header.',
+                    },
+                    {
+                        title: 'Mobile',
+                        text: 'A Flutter app with Google Maps for farm pins, the checkout drop-off pin and transporter maps; transporters share location only while online with the app open, and Firebase Cloud Messaging delivers push notifications.',
+                    },
+                    {
+                        title: 'Blockchain',
+                        text: 'A Hyperledger Fabric network with Go chaincode that records payments (Stripe, JazzCash, Safepay) and supply-chain events such as listed, assigned, picked up, in transit and delivered. Writes are validated and idempotent, and the ledger can be queried by ledger key, reference or product.',
+                    },
+                    {
+                        title: 'AI',
+                        text: 'A FastAPI inference service that suggests an A–D quality grade from a photo of wheat, rice, mango or maize (EfficientNet-B0) for the farmer to confirm, plus a rule-based price-range estimate in PKR per unit.',
+                    },
                 ],
             },
             {
@@ -182,6 +270,23 @@ export const caseStudies = [
         links: [
             { label: 'View on GitHub', href: 'https://github.com/junii03/Advance-Web-Programming/tree/main/Project' },
         ],
+        image: '/assets/projects/hbl-clone.webp',
+        imageSize: [1600, 1000],
+        highlights: [
+            { value: '4', label: 'Roles: customer, employee, manager, admin' },
+            { value: '5', label: 'Account types' },
+            { value: '2', label: 'Client apps on one API' },
+        ],
+        diagram: {
+            type: 'tiles',
+            title: 'How it fits together',
+            items: [
+                { label: 'React web app', sub: 'Vite · Tailwind CSS' },
+                { label: 'Expo mobile app', sub: 'React Native · NativeWind' },
+                { label: 'Express API', sub: 'JWT · Socket.IO · Swagger' },
+                { label: 'MongoDB + Redis', sub: 'Data and caching' },
+            ],
+        },
         sections: [
             {
                 heading: 'Overview',
@@ -192,17 +297,35 @@ export const caseStudies = [
             {
                 heading: 'What the platform does',
                 bullets: [
-                    'Accounts and transactions — multiple account types (savings, current, fixed deposit, Islamic savings, salary), fund transfers, deposits and withdrawals, with real-time notifications over Socket.IO.',
-                    'Cards and loans — debit and credit card management, loan applications with EMI calculation and an approval workflow, and a branch and ATM locator.',
-                    'Administration — an admin dashboard with system statistics, user and transaction oversight, and reporting.',
+                    {
+                        title: 'Accounts and transactions',
+                        text: 'Multiple account types (savings, current, fixed deposit, Islamic savings, salary), fund transfers, deposits and withdrawals, with real-time notifications over Socket.IO.',
+                    },
+                    {
+                        title: 'Cards and loans',
+                        text: 'Debit and credit card management, loan applications with EMI calculation and an approval workflow, and a branch and ATM locator.',
+                    },
+                    {
+                        title: 'Administration',
+                        text: 'An admin dashboard with system statistics, user and transaction oversight, and reporting.',
+                    },
                 ],
             },
             {
                 heading: 'Security and quality',
                 bullets: [
-                    'JWT authentication with role-based access for customers, employees, managers and admins.',
-                    'Rate limiting, account lockout after failed logins, transaction monitoring that flags suspicious activity, and audit logging.',
-                    'Redis caching and an OpenAPI/Swagger specification documenting the REST API.',
+                    {
+                        title: 'Access control',
+                        text: 'JWT authentication with role-based access for customers, employees, managers and admins.',
+                    },
+                    {
+                        title: 'Abuse protection',
+                        text: 'Rate limiting, account lockout after failed logins, transaction monitoring that flags suspicious activity, and audit logging.',
+                    },
+                    {
+                        title: 'Performance and docs',
+                        text: 'Redis caching and an OpenAPI/Swagger specification documenting the REST API.',
+                    },
                 ],
             },
             {

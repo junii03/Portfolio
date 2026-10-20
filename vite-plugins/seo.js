@@ -342,9 +342,14 @@ function buildCaseStudyGraph(cs, modified) {
     };
 }
 
-// Static, zero-JS case-study page. Styled with the same compiled Tailwind CSS as the SPA.
+// Static case-study page. Styled with the same compiled Tailwind CSS as the SPA; a
+// ~10-line inline script highlights the current section in the contents list.
 function buildCaseStudyPage(cs, { cssTags, modified }) {
-    const others = caseStudies.filter((c) => c.slug !== cs.slug);
+    const idx = caseStudies.findIndex((c) => c.slug === cs.slug);
+    const prev = caseStudies[(idx - 1 + caseStudies.length) % caseStudies.length];
+    const next = caseStudies[(idx + 1) % caseStudies.length];
+    const pad = (n) => String(n).padStart(2, '0');
+    const slugify = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     const head = buildHead({
         title: cs.title,
         description: cs.description,
@@ -353,12 +358,64 @@ function buildCaseStudyPage(cs, { cssTags, modified }) {
         ogType: 'article',
         keywords: [cs.name, ...cs.keywords, SITE.name],
     });
+
+    // Render order: Overview, diagram (if any), remaining sections, Stack — numbered in that order.
+    const blocks = cs.sections.map((sec) => ({ kind: 'section', sec }));
+    if (cs.diagram) blocks.splice(1, 0, { kind: 'diagram' });
+    const toc = [
+        ...blocks.map((b) =>
+            b.kind === 'diagram'
+                ? { id: 'diagram', label: cs.diagram.title }
+                : { id: slugify(b.sec.heading), label: b.sec.heading },
+        ),
+        { id: 'stack', label: 'Stack' },
+    ];
     const meta = [
         ['Role', cs.role],
         ['Company', cs.company],
         ['Period', cs.period],
-        ['Status', cs.status],
     ];
+
+    const titleWords = cs.name
+        .split(' ')
+        .map((w, i) => `<span class="cs-word"><span style="--i:${i}">${esc(w)}</span></span>`)
+        .join(' ');
+
+    const diagramHtml = (n) => `        <section id="diagram" class="cs-reveal scroll-mt-10 border-t border-black/80 py-12 md:py-16">
+            <p class="text-sm tracking-[0.3em] text-gold-deep">${pad(n)}</p>
+            <h2 class="mt-3 text-4xl font-light uppercase leading-tight md:text-6xl">${esc(cs.diagram.title)}</h2>
+            <ol class="${cs.diagram.type === 'flow' ? 'cs-flow' : 'cs-tiles'} mt-10 grid gap-6" style="--n:${Math.min(cs.diagram.items.length, 4)}">
+${cs.diagram.items
+    .map(
+        (it, i) =>
+            `                <li class="cs-step rounded-2xl bg-black p-6 text-white md:p-7"><span class="text-xs tracking-[0.3em] text-gold">${pad(i + 1)}</span><p class="mt-4 text-2xl font-light md:text-3xl">${esc(it.label)}</p>${it.sub ? `<p class="mt-2 text-sm font-light leading-relaxed text-white/60 md:text-base">${esc(it.sub)}</p>` : ''}</li>`,
+    )
+    .join('\n')}
+            </ol>
+        </section>`;
+
+    const sectionHtml = (sec, n) => `        <section id="${slugify(sec.heading)}" class="cs-reveal scroll-mt-10 border-t border-black/80 py-12 md:py-16">
+            <p class="text-sm tracking-[0.3em] text-gold-deep">${pad(n)}</p>
+            <h2 class="mt-3 text-4xl font-light uppercase leading-tight md:text-6xl">${esc(sec.heading)}</h2>
+${
+    sec.paragraphs
+        ? `            <div class="mt-8 flex max-w-3xl flex-col gap-6 text-lg font-light leading-relaxed text-black/80 md:text-2xl">${sec.paragraphs.map((t) => `<p>${esc(t)}</p>`).join('')}</div>`
+        : ''
+}
+${
+    sec.bullets
+        ? `            <ol class="mt-8 grid gap-4 ${sec.bullets.length > 2 ? 'md:grid-cols-2' : ''}">${sec.bullets
+              .map(
+                  (b, j) =>
+                      `<li class="cs-card rounded-2xl border border-black/15 bg-white/40 p-6 md:p-8"><span class="text-xs tracking-[0.3em] text-gold-deep">${pad(j + 1)}</span><h3 class="mt-3 text-2xl font-light md:text-3xl">${esc(b.title)}</h3><p class="mt-3 text-base font-light leading-relaxed text-black/75 md:text-lg">${esc(b.text)}</p></li>`,
+              )
+              .join('')}</ol>`
+        : ''
+}
+        </section>`;
+
+    const body = blocks.map((b, i) => (b.kind === 'diagram' ? diagramHtml(i + 1) : sectionHtml(b.sec, i + 1))).join('\n');
+
     return `<!doctype html>
 <html lang="${SITE.language}">
 <head>
@@ -374,78 +431,122 @@ ${cssTags}
 </head>
 <body>
 <a href="#main" class="skip-link">Skip to content</a>
-<header class="flex items-center justify-between px-6 py-6 text-sm uppercase tracking-[0.25em] md:px-10">
+<div class="cs-progress" aria-hidden="true"></div>
+<header class="flex items-center justify-between px-6 py-6 text-xs uppercase tracking-[0.25em] md:px-10 md:text-sm">
     <a href="/" class="transition-colors hover:text-gold-deep">&larr; ${esc(SITE.name)}</a>
+    <span class="hidden text-black/55 sm:block">Case study ${pad(idx + 1)} / ${pad(caseStudies.length)}</span>
     <a href="/#work" class="transition-colors hover:text-gold-deep">All work</a>
 </header>
 <main id="main">
-    <section class="rounded-4xl bg-black px-6 pb-16 pt-12 text-white md:px-10 md:pb-24 md:pt-20">
-        <p class="text-xs font-light uppercase tracking-[0.4em] text-white/60 md:text-sm">${esc(cs.kind)}</p>
-        <h1 class="mt-8 max-w-5xl text-5xl font-light uppercase leading-[1.02] md:text-7xl lg:text-8xl">${esc(cs.name)}</h1>
-        <p class="mt-8 max-w-3xl text-xl font-light leading-relaxed text-white/75 md:text-3xl">${esc(cs.headline)}</p>
-        <dl class="mt-14 grid gap-x-10 gap-y-8 border-t border-white/25 pt-8 sm:grid-cols-2 lg:grid-cols-4">
-${meta
-    .map(
-        ([k, v]) =>
-            `            <div><dt class="text-xs font-light uppercase tracking-[0.25em] text-white/55">${k}</dt><dd class="mt-2 text-base font-light md:text-lg">${esc(v)}</dd></div>`,
-    )
-    .join('\n')}
-        </dl>
-    </section>
-    <article class="mx-auto max-w-5xl px-6 py-16 font-light md:px-10 md:py-24">
-${cs.sections
-    .map(
-        (sec) => `        <section class="grid gap-4 border-t border-black/80 py-10 md:grid-cols-[minmax(0,1fr)_minmax(0,2.4fr)] md:gap-12 md:py-14">
-            <h2 class="text-3xl uppercase md:text-4xl">${esc(sec.heading)}</h2>
-            <div class="flex flex-col gap-5 text-lg leading-relaxed text-black/80 md:text-xl">
-${(sec.paragraphs || []).map((t) => `                <p>${esc(t)}</p>`).join('\n')}
-${
-    sec.bullets
-        ? `                <ul class="flex flex-col gap-4">${sec.bullets
-              .map(
-                  (b) =>
-                      `<li class="flex gap-4"><span aria-hidden="true" class="mt-[0.8em] h-px w-6 shrink-0 bg-gold-deep"></span><span>${esc(b)}</span></li>`,
-              )
-              .join('')}</ul>`
-        : ''
-}
+    <section class="relative mx-2 overflow-hidden rounded-4xl bg-black text-white md:mx-3">
+        <div class="cs-glow cs-glow-a" aria-hidden="true"></div>
+        <div class="cs-glow cs-glow-b" aria-hidden="true"></div>
+        <div class="relative px-6 pb-12 pt-12 md:px-12 md:pb-16 md:pt-20">
+            <div class="flex flex-wrap items-center gap-x-5 gap-y-3 text-xs uppercase tracking-[0.3em]">
+                <span class="inline-flex items-center gap-2 rounded-full border border-white/25 px-4 py-1.5"><span class="cs-dot"></span>${esc(cs.status)}</span>
+                <span class="font-light text-white/60">${esc(cs.kind)}</span>
             </div>
-        </section>`,
-    )
-    .join('\n')}
-        <section class="grid gap-4 border-t border-black/80 py-10 md:grid-cols-[minmax(0,1fr)_minmax(0,2.4fr)] md:gap-12 md:py-14">
-            <h2 class="text-3xl uppercase md:text-4xl">Stack</h2>
-            <ul class="flex flex-wrap gap-2" aria-label="Technologies">${cs.stack
-                .map((t) => `<li class="rounded-full border border-black/40 px-4 py-1.5 text-sm tracking-wide md:text-base">${esc(t)}</li>`)
-                .join('')}</ul>
-        </section>
+            <h1 class="mt-8 text-[clamp(3rem,9.5vw,9rem)] font-light uppercase leading-[0.98]">${titleWords}</h1>
+            <p class="cs-fade mt-8 max-w-3xl text-xl font-light leading-relaxed text-white/75 md:text-3xl">${esc(cs.headline)}</p>
 ${
     cs.links.length
-        ? `        <p class="flex flex-wrap gap-4 border-t border-black/80 pt-10">${cs.links
+        ? `            <p class="cs-fade mt-10 flex flex-wrap gap-3">${cs.links
               .map(
                   (l) =>
-                      `<a href="${esc(l.href)}" target="_blank" rel="noopener noreferrer" class="rounded-full bg-black px-6 py-3 text-xs uppercase tracking-[0.25em] text-white transition-colors hover:bg-DarkLava md:text-sm">${esc(l.label)} &nearr;</a>`,
+                      `<a href="${esc(l.href)}" target="_blank" rel="noopener noreferrer" class="rounded-full bg-white px-6 py-3 text-xs uppercase tracking-[0.25em] text-black transition-colors hover:bg-gold md:text-sm">${esc(l.label)} &nearr;</a>`,
               )
               .join('')}</p>`
         : ''
 }
-    </article>
-    <nav aria-label="More case studies" class="rounded-t-4xl bg-black px-6 py-16 text-white md:px-10">
-        <h2 class="text-sm font-light uppercase tracking-[0.3em] text-white/60">More work</h2>
-        <ul class="mt-8 divide-y divide-white/20 border-y border-white/20">
-${others
+            <dl class="cs-fade mt-14 grid gap-x-8 gap-y-8 border-t border-white/20 pt-10 sm:grid-cols-3">
+${cs.highlights
     .map(
-        (o) =>
-            `            <li><a href="/projects/${o.slug}/" class="flex items-center justify-between gap-6 py-6 text-2xl font-light transition-colors hover:text-gold md:text-4xl"><span>${esc(o.name)}</span><span class="hidden text-sm uppercase tracking-[0.2em] text-white/55 md:block">${esc(o.kind)}</span></a></li>`,
+        (h) =>
+            `                <div><dd class="text-6xl font-light text-gold md:text-7xl">${esc(h.value)}</dd><dt class="mt-3 text-sm font-light leading-snug text-white/65 md:text-base">${esc(h.label)}</dt></div>`,
     )
     .join('\n')}
-        </ul>
-        <p class="mt-14 text-sm font-light uppercase tracking-[0.2em] text-white/60">
-            <a class="transition-colors hover:text-gold" href="mailto:${SITE.email}">${SITE.email}</a>
-            &nbsp;·&nbsp; ${socials.map((s) => `<a class="transition-colors hover:text-gold" href="${esc(s.href)}" target="_blank" rel="me noopener noreferrer">${esc(s.name)}</a>`).join(' &nbsp;·&nbsp; ')}
+            </dl>
+            <dl class="cs-fade mt-12 grid gap-x-8 gap-y-6 border-t border-white/20 pt-8 sm:grid-cols-3">
+${meta
+    .map(
+        ([k, v]) =>
+            `                <div><dt class="text-xs font-light uppercase tracking-[0.25em] text-white/70">${k}</dt><dd class="mt-2 text-base font-light md:text-lg">${esc(v)}</dd></div>`,
+    )
+    .join('\n')}
+            </dl>
+        </div>
+    </section>
+
+    <div class="mx-auto max-w-7xl px-6 py-14 md:px-10 md:py-20 lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-16">
+        <aside class="hidden lg:block">
+            <nav aria-label="On this page" class="sticky top-10">
+                <p class="text-xs font-light uppercase tracking-[0.3em] text-black/55">On this page</p>
+                <ul class="cs-toc mt-5 flex flex-col gap-1 border-l border-black/20">
+${toc.map((t) => `                    <li><a href="#${t.id}" data-toc="${t.id}" class="block py-1.5 pl-4 text-sm font-light tracking-wide text-black/60 transition-colors hover:text-black">${esc(t.label)}</a></li>`).join('\n')}
+                </ul>
+            </nav>
+        </aside>
+        <article class="min-w-0">
+${
+    cs.image
+        ? `            <figure class="cs-reveal mb-4 overflow-hidden rounded-2xl border border-black/15 bg-black shadow-2xl">
+                <div class="flex gap-2 border-b border-white/10 px-4 py-3" aria-hidden="true"><i class="size-2.5 rounded-full bg-white/25"></i><i class="size-2.5 rounded-full bg-white/25"></i><i class="size-2.5 rounded-full bg-white/25"></i></div>
+                <img src="${cs.image}" alt="${esc(cs.name)} web app screenshot" width="${cs.imageSize[0]}" height="${cs.imageSize[1]}" class="w-full" decoding="async" />
+            </figure>`
+        : ''
+}
+${body}
+            <section id="stack" class="cs-reveal scroll-mt-10 border-y border-black/80 py-12 md:py-16">
+                <p class="text-sm tracking-[0.3em] text-gold-deep">${pad(blocks.length + 1)}</p>
+                <h2 class="mt-3 text-4xl font-light uppercase leading-tight md:text-6xl">Stack</h2>
+                <ul class="mt-8 flex flex-wrap gap-2.5" aria-label="Technologies">${cs.stack
+                    .map(
+                        (t) =>
+                            `<li class="cs-chip rounded-full border border-black/35 px-5 py-2 text-sm font-light tracking-wide md:text-base">${esc(t)}</li>`,
+                    )
+                    .join('')}</ul>
+            </section>
+        </article>
+    </div>
+
+    <nav aria-label="More case studies" class="rounded-t-4xl bg-black px-6 pb-8 pt-14 text-white md:px-10 md:pt-20">
+        <div class="grid gap-4 md:grid-cols-2">
+            <a href="/projects/${prev.slug}/" rel="prev" class="cs-next group rounded-2xl border border-white/20 p-6 md:p-8">
+                <span class="text-xs font-light uppercase tracking-[0.3em] text-white/55">&larr; Previous</span>
+                <span class="mt-4 block text-3xl font-light md:text-5xl">${esc(prev.name)}</span>
+                <span class="mt-3 block text-sm font-light text-white/55">${esc(prev.kind)}</span>
+            </a>
+            <a href="/projects/${next.slug}/" rel="next" class="cs-next group rounded-2xl border border-white/20 p-6 md:p-8 md:text-right">
+                <span class="text-xs font-light uppercase tracking-[0.3em] text-white/55">Next &rarr;</span>
+                <span class="mt-4 block text-3xl font-light md:text-5xl">${esc(next.name)}</span>
+                <span class="mt-3 block text-sm font-light text-white/55">${esc(next.kind)}</span>
+            </a>
+        </div>
+        <div class="mt-16 flex flex-col gap-6 border-t border-white/20 pt-10 md:flex-row md:items-end md:justify-between">
+            <p class="max-w-xl text-3xl font-light leading-tight md:text-5xl">Have a project in mind? <span class="text-gold">Let’s talk.</span></p>
+            <a href="mailto:${SITE.email}" class="w-fit rounded-full bg-white px-6 py-3 text-xs uppercase tracking-[0.25em] text-black transition-colors hover:bg-gold md:text-sm">${SITE.email}</a>
+        </div>
+        <p class="mt-12 flex flex-wrap gap-x-6 gap-y-2 text-xs font-light uppercase tracking-[0.2em] text-white/55">
+            <a class="transition-colors hover:text-gold" href="/">Portfolio</a>
+            ${socials.map((s) => `<a class="transition-colors hover:text-gold" href="${esc(s.href)}" target="_blank" rel="me noopener noreferrer">${esc(s.name)}</a>`).join('\n            ')}
         </p>
     </nav>
 </main>
+<script>
+(function () {
+    var links = [].slice.call(document.querySelectorAll('[data-toc]'));
+    if (!links.length || !('IntersectionObserver' in window)) return;
+    var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+            if (!e.isIntersecting) return;
+            links.forEach(function (a) { a.removeAttribute('aria-current'); });
+            var a = links.filter(function (l) { return l.dataset.toc === e.target.id; })[0];
+            if (a) a.setAttribute('aria-current', 'true');
+        });
+    }, { rootMargin: '-25% 0px -65% 0px' });
+    links.forEach(function (a) { var s = document.getElementById(a.dataset.toc); if (s) io.observe(s); });
+})();
+</script>
 </body>
 </html>
 `;
