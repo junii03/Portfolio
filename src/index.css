@@ -1,91 +1,43 @@
 @import "tailwindcss";
-@import "tailwindcss";
 
-/* Amiamie Regular */
+/* Amiamie — WOFF2 subsets of only the weights/styles the UI uses */
 @font-face {
     font-family: "Amiamie";
-    src: url("/fonts/amiamie/otf/Amiamie-Regular.otf") format("opentype"),
-        url("/fonts/amiamie/ttf/Amiamie-Regular.ttf") format("truetype");
+    src: url("/fonts/amiamie/woff2/Amiamie-Regular.woff2") format("woff2");
     font-weight: 400;
     font-style: normal;
     font-display: swap;
 }
 
-/* Amiamie Regular Italic */
 @font-face {
     font-family: "Amiamie";
-    src: url("/fonts/amiamie/otf/Amiamie-Italic.otf") format("opentype"),
-        url("/fonts/amiamie/ttf/Amiamie-Italic.ttf") format("truetype");
+    src: url("/fonts/amiamie/woff2/Amiamie-Italic.woff2") format("woff2");
     font-weight: 400;
     font-style: italic;
     font-display: swap;
 }
 
-/* Amiamie Light */
 @font-face {
     font-family: "Amiamie";
-    src: url("/fonts/amiamie/otf/Amiamie-Light.otf") format("opentype"),
-        url("/fonts/amiamie/ttf/Amiamie-Light.ttf") format("truetype");
+    src: url("/fonts/amiamie/woff2/Amiamie-Light.woff2") format("woff2");
     font-weight: 300;
     font-style: normal;
     font-display: swap;
 }
 
-/* Amiamie Light Italic */
 @font-face {
     font-family: "Amiamie";
-    src: url("/fonts/amiamie/otf/Amiamie-LightItalic.otf") format("opentype"),
-        url("/fonts/amiamie/ttf/Amiamie-LightItalic.ttf") format("truetype");
+    src: url("/fonts/amiamie/woff2/Amiamie-LightItalic.woff2") format("woff2");
     font-weight: 300;
     font-style: italic;
     font-display: swap;
 }
 
-/* Amiamie Black */
 @font-face {
     font-family: "Amiamie";
-    src: url("/fonts/amiamie/otf/Amiamie-Black.otf") format("opentype"),
-        url("/fonts/amiamie/ttf/Amiamie-Black.ttf") format("truetype");
+    src: url("/fonts/amiamie/woff2/Amiamie-Black.woff2") format("woff2");
     font-weight: 900;
     font-style: normal;
-    font-display: swap;
-}
-
-/* Amiamie Black Italic */
-@font-face {
-    font-family: "Amiamie";
-    src: url("/fonts/amiamie/otf/Amiamie-BlackItalic.otf") format("opentype"),
-        url("/fonts/amiamie/ttf/Amiamie-BlackItalic.ttf") format("truetype");
-    font-weight: 900;
-    font-style: italic;
-    font-display: swap;
-}
-
-/* Amiamie-Round Variants (if needed separately) */
-@font-face {
-    font-family: "Amiamie-Round";
-    src: url("/fonts/amiamie/otf/Amiamie-RegularRound.otf") format("opentype"),
-        url("/fonts/amiamie/ttf/Amiamie-RegularRound.ttf") format("truetype");
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "Amiamie-Round";
-    src: url("/fonts/amiamie/otf/Amiamie-BlackRound.otf") format("opentype"),
-        url("/fonts/amiamie/ttf/Amiamie-BlackRound.ttf") format("truetype");
-    font-weight: 900;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: "Amiamie-Round";
-    src: url("/fonts/amiamie/otf/Amiamie-BlackItalicRound.otf") format("opentype"),
-        url("/fonts/amiamie/ttf/Amiamie-BlackItalicRound.ttf") format("truetype");
-    font-weight: 900;
-    font-style: italic;
     font-display: swap;
 }
 
@@ -95,7 +47,6 @@
     --color-SageGray: #8b8b73;
     --color-gold: #cfa355;
     --font-amiamie: "Amiamie", sans-serif;
-    --font-amiamie-round: "Amiamie-Round", sans-serif;
 
     --animate-marquee: marquee 40s infinite linear;
 
@@ -113,9 +64,72 @@
 body {
     background: #e5e5e0;
     color: black;
-    scroll-behavior: smooth;
     overflow-x: hidden;
     font-family: var(--font-amiamie);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* Lenis smooth-scroll recommended base styles */
+html.lenis,
+html.lenis body {
+    height: auto;
+}
+
+.lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+    overflow: hidden;
+}
+
+/* Keyboard focus: visible, on-brand, never on mouse clicks */
+:focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+
+::selection {
+    background: var(--color-gold);
+    color: #000;
+}
+
+/* Skip link */
+.skip-link {
+    position: fixed;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 1000;
+    padding: 0.6rem 1rem;
+    border-radius: 999px;
+    background: #000;
+    color: #fff;
+    font-size: 0.875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transform: translateY(-200%);
+    transition: transform 0.2s ease;
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }
 
 @utility clip-path {

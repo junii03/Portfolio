@@ -1,4 +1,6 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
+import { FourPointStar, Square } from "./Icons";
+
+const iconMap = { star: FourPointStar, square: Square };
 import gsap from "gsap";
 import { Observer } from "gsap/all";
 import { useEffect, useRef, useState, useCallback } from "react";
@@ -8,7 +10,7 @@ gsap.registerPlugin(Observer);
 export default function Marquee({
     items = [],
     className = "text-white bg-black",
-    icon = "mdi:star-four-points",
+    icon = "star",
     iconClassName = "",
     reverse = false,
     speed = 100 // px / second base speed (increase to go faster)
@@ -32,6 +34,8 @@ export default function Marquee({
     const visibleRef = useRef(true);
     const prefersReducedMotionRef = useRef(false);
 
+    const IconComp = iconMap[icon] ?? iconMap.star;
+
     // helper to build one set of items
     const buildSingleSet = (keyBase = "") => (
         <div
@@ -46,7 +50,7 @@ export default function Marquee({
                     className="flex items-center px-8 md:px-16 gap-x-4 md:gap-x-8"
                     style={{ display: "inline-flex", whiteSpace: "nowrap" }}
                 >
-                    {text} <Icon icon={icon} className={iconClassName} />
+                    {text} <IconComp className={iconClassName} />
                 </span>
             ))}
         </div>

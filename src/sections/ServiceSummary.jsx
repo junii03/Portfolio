@@ -25,24 +25,24 @@ const ServiceSummary = () => {
     });
 
     return (
-        <section className="mt-20 overflow-hidden font-light leading-snug text-center mb-42 contact-text-responsive">
+        <section aria-hidden="true" className="mt-20 overflow-hidden font-light leading-snug text-center mb-42 contact-text-responsive">
             <div id='title-service-1'>
                 <p>Architecture</p>
             </div>
             <div id='title-service-2' className="flex items-center justify-center gap-3">
-                <p className="font-normal">Development</p>
+                <p className="font-normal">Mobile</p>
                 <div className="w-10 h-1 md:w-32 bg-gold" />
-                <p>Design</p>
+                <p>Backend</p>
             </div>
             <div id='title-service-3' className="flex items-center justify-center gap-3">
-                <p className="font-normal">APIs</p>
+                <p className="font-normal">Flutter</p>
                 <div className="w-10 h-1 md:w-32 bg-gold" />
-                <p className="italic">Frontend</p>
+                <p className="italic">React Native</p>
                 <div className="w-10 h-1 md:w-32 bg-gold" />
-                <p>Scalability</p>
+                <p>NestJS</p>
             </div>
             <div id='title-service-4' className="flex items-center justify-center gap-3">
-                <p>Data & Storage</p>
+                <p>AI &amp; Real-time</p>
             </div>
         </section>
     )
