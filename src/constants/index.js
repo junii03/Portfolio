@@ -189,9 +189,9 @@ export const projects = [
         caseStudy: 'farm2fork',
         kind: 'Final Year Project · University of Central Punjab · Apr 2026 – Feb 2027',
         description:
-            'Farmer-to-consumer marketplace backed by a Hyperledger Fabric ledger, with AI modules — plus market research, competitor and SWOT analysis behind its go-to-market strategy, pricing and positioning.',
+            'Farmer-to-buyer marketplace: NestJS API, Next.js and Flutter apps, a Hyperledger Fabric ledger for payments and supply-chain events, and an AI crop-grading service — plus go-to-market research and pricing strategy.',
         href: 'https://github.com/Farm2Fork-Project',
-        frameworks: ['Hyperledger Fabric', 'AI / ML', 'Marketplace'],
+        frameworks: ['NestJS', 'Next.js', 'Flutter', 'Hyperledger Fabric', 'FastAPI'],
     },
     {
         id: 4,
