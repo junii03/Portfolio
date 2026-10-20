@@ -1,145 +1,202 @@
-import React, { useRef, useState } from 'react'
-import AnimatedHeaderSection from '../components/AnimatedHeaderSection'
-import { projects } from '../constants';
-import { Icon } from '@iconify/react/dist/iconify.js';
+import { useRef, useState } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import AnimatedHeaderSection from '../components/AnimatedHeaderSection';
+import { ArrowUpRight } from '../components/Icons';
+import { projects, worksIntro, socials } from '../constants';
+
+const PREVIEW_W = 340;
+const PREVIEW_H = 200;
+const isDesktop = () => window.innerWidth >= 1024;
+const pad = (n) => String(n).padStart(2, '0');
 
 const Works = () => {
-    const [currentIndex, setCurrentIndex] = useState(null)
-    const text = 'Featured projects that showcase my skills\n and passion for creating impactful digital solutions';
+    const [active, setActive] = useState(null);
+    const listRef = useRef(null);
     const previewRef = useRef(null);
-    const mouse = useRef({ x: 0, y: 0 });
     const moveX = useRef(null);
     const moveY = useRef(null);
     const overlayRef = useRef([]);
 
     useGSAP(() => {
-        moveX.current = gsap.quickTo(previewRef.current, "x", {
-            duration: 1.5,
-            ease: "power3.out",
+        moveX.current = gsap.quickTo(previewRef.current, 'x', { duration: 0.6, ease: 'power3.out' });
+        moveY.current = gsap.quickTo(previewRef.current, 'y', { duration: 0.6, ease: 'power3.out' });
+
+        gsap.from('.project-row', {
+            y: 60,
+            autoAlpha: 0,
+            stagger: 0.1,
+            duration: 0.9,
+            ease: 'power3.out',
+            scrollTrigger: { trigger: listRef.current, start: 'top 85%' },
         });
-        moveY.current = gsap.quickTo(previewRef.current, "y", {
-            duration: 2,
-            ease: "power3.out",
-        });
+    }, []);
 
-        gsap.from("#project", {
-            y: 100,
-            opacity: 0,
-            delay: 0.5,
-            stagger: 0.3,
-            duration: 1,
-            ease: "back.out",
-            scrollTrigger: {
-                trigger: "#project",
+    // Keep the small preview inside the viewport, to the lower-right of the pointer
+    const follow = (x, y) => {
+        moveX.current(Math.min(x + 28, window.innerWidth - PREVIEW_W - 24));
+        moveY.current(Math.min(y + 28, window.innerHeight - PREVIEW_H - 24));
+    };
 
-            }
-        })
-    })
-    const handleMouseEnter = (index) => {
-        if (window.innerWidth < 768) return; // Prevent hover effect on mobile
-        setCurrentIndex(index);
-        const overlayElement = overlayRef.current[index];
-        if (!overlayElement) return;
-        gsap.killTweensOf(overlayElement);
-        gsap.fromTo(overlayElement,
-            {
-                clipPath: "polygon(0 100%, 100% 100%, 100% 100%, 0 100%)",
-            },
-            {
-                clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 100%)",
-                duration: 0.15,
-                ease: "power2.out",
-            }
-        );
+    const show = (index, point) => {
+        if (!isDesktop()) return;
+        setActive(index);
+        if (point) follow(point.x, point.y);
+        const overlay = overlayRef.current[index];
+        if (overlay) {
+            gsap.killTweensOf(overlay);
+            gsap.to(overlay, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.35, ease: 'power3.out' });
+        }
+        if (projects[index].image) {
+            gsap.to(previewRef.current, { autoAlpha: 1, scale: 1, duration: 0.25, ease: 'power2.out' });
+        }
+    };
 
+    const hide = (index) => {
+        if (!isDesktop()) return;
+        setActive(null);
+        const overlay = overlayRef.current[index];
+        if (overlay) {
+            gsap.killTweensOf(overlay);
+            gsap.to(overlay, { clipPath: 'inset(100% 0% 0% 0%)', duration: 0.3, ease: 'power3.inOut' });
+        }
+        gsap.to(previewRef.current, { autoAlpha: 0, scale: 0.92, duration: 0.2, ease: 'power2.in' });
+    };
 
-        gsap.to(previewRef.current, {
-            opacity: 1,
-            scale: 1,
-            duration: 0.3,
-            ease: "power2.out",
+    const onMouseMove = (e) => {
+        if (isDesktop()) follow(e.clientX, e.clientY);
+    };
 
-        });
-    }
-    const handleMouseLeave = (index) => {
-        if (window.innerWidth < 768) return; // Prevent hover effect on mobile
-        setCurrentIndex(null);
-
-        const overlayElement = overlayRef.current[index];
-        if (!overlayElement) return;
-        gsap.killTweensOf(overlayElement);
-        gsap.to(overlayElement, {
-            clipPath: "polygon(0 100%, 100% 100%, 100% 100%, 0 100%)",
-            duration: 0.15,
-            ease: "power2.out",
-        });
-        gsap.to(previewRef.current, {
-            opacity: 0,
-            scale: 0.5,
-            duration: 0.3,
-            ease: "power2.out",
-
-        });
-    }
-
-    const handleMouseMove = (e) => {
-        if (window.innerWidth < 768) return; // Prevent hover effect on mobile
-        mouse.current.x = e.clientX + 24;
-        mouse.current.y = e.clientY + 24;
-        moveX.current(mouse.current.x);
-        moveY.current(mouse.current.y);
-    }
-
+    // Keyboard users get the same preview, anchored beside the focused row
+    const onFocus = (index, e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        show(index, { x: r.right - PREVIEW_W - 120, y: r.top });
+    };
 
     return (
-        <section id='work' className='flex flex-col min-h-screen'>
-            <AnimatedHeaderSection subtitle={"Logic meets Aesthetics, Seamlessly"} title={"Works"} text={text} textColor={"text-black"} withScrollTrigger={true} />
-            <div className='relative flex flex-col font-light' onMouseMove={handleMouseMove}>
-                {projects.map((project, index) => (
-                    <div key={project.id} id='project' className='relative flex flex-col gap-1 py-5 cursor-pointer group md:gap-0' onMouseEnter={() => handleMouseEnter(index)} onMouseLeave={() => handleMouseLeave(index)} onClick={() => window.open(project.href, '_blank', 'noopener,noreferrer')}>
-                        {/* overlay */}
-                        <div
-                            className='absolute inset-0 hidden md:block duration-200 bg-gradient-to-r from-black/90 via-black/70 to-black/90 -z-10 clip-path'
-                            ref={(el) => { overlayRef.current[index] = el }}
-                        />
-                        {/* title + one-liner */}
-                        <div className='flex flex-col px-10 text-black transition-all duration-500 md:group-hover:px-12 md:group-hover:text-white'>
-                            <div className="flex justify-between items-center">
-                                <h2 className='lg:text-[32px] text-[26px] leading-none '>
-                                    {project.name}
-                                </h2>
-                                <Icon icon="mynaui:arrow-up-right-square" className='md:size-6 size-5' />
-                            </div>
-                            {project.description && (
-                                <p className="mt-1 text-sm md:text-base text-black/70 md:group-hover:text-white/80">
+        <section id="work" className="flex flex-col min-h-screen">
+            <AnimatedHeaderSection
+                subtitle={worksIntro.subtitle}
+                title={worksIntro.title}
+                text={worksIntro.text}
+                textColor="text-black"
+                withScrollTrigger={true}
+            />
+            <ul ref={listRef} className="relative flex flex-col border-t border-black/80 font-light" onMouseMove={onMouseMove}>
+                {projects.map((project, index) => {
+                    const internal = project.caseStudy ? `/projects/${project.caseStudy}/` : null;
+                    const linked = internal || project.href;
+                    const Tag = linked ? 'a' : 'div';
+                    const linkProps = internal
+                        ? { href: internal, 'aria-label': `${project.name} — read the case study` }
+                        : project.href
+                            ? {
+                                href: project.href,
+                                target: '_blank',
+                                rel: 'noopener noreferrer',
+                                'aria-label': `${project.name} — opens in a new tab`,
+                            }
+                            : {};
+                    return (
+                        <li key={project.id} className="project-row border-b border-black/80">
+                            <Tag
+                                {...linkProps}
+                                className="group relative grid gap-4 px-10 py-8 lg:grid-cols-[3rem_minmax(0,1.3fr)_minmax(0,1.6fr)_minmax(0,1fr)_3rem] lg:items-center lg:gap-8 lg:py-10"
+                                onMouseEnter={() => show(index)}
+                                onMouseLeave={() => hide(index)}
+                                onFocus={linked ? (e) => onFocus(index, e) : undefined}
+                                onBlur={linked ? () => hide(index) : undefined}
+                            >
+                                <div
+                                    aria-hidden="true"
+                                    className="absolute inset-0 hidden bg-black -z-10 lg:block"
+                                    style={{ clipPath: 'inset(100% 0% 0% 0%)' }}
+                                    ref={(el) => { overlayRef.current[index] = el; }}
+                                />
+
+                                <span className="hidden text-sm tracking-[0.2em] text-black/55 transition-colors duration-300 lg:block lg:group-hover:text-white/50">
+                                    {pad(index + 1)}
+                                </span>
+
+                                <div className="transition-colors duration-300 lg:group-hover:text-white">
+                                    <h3 className="text-3xl leading-tight lg:text-[40px]">{project.name}</h3>
+                                    <p className="mt-2 text-[11px] uppercase tracking-[0.25em] text-black/65 transition-colors duration-300 lg:group-hover:text-white/60">
+                                        {project.kind}
+                                    </p>
+                                </div>
+
+                                <p className="max-w-xl text-sm leading-relaxed text-black/70 transition-colors duration-300 md:text-base lg:group-hover:text-white/75">
                                     {project.description}
                                 </p>
-                            )}
-                        </div>
-                        {/* divider */}
-                        <div className='w-full h-0.5 bg-black/80' />
-                        {/* framework */}
-                        <div className='flex px-10 text-xs leading-loose transition-all duration-500 md:text-sm gap-x-5 md:group-hover:px-12'> {project.frameworks.map((framework) => (
-                            <p key={framework.id} className='transition-colors duration-500 text-black md:group-hover:text-white' >{framework.name}</p>
-                        ))}</div>
-                        {/* mobile preview images */}
-                        <div className='relative flex items-center justify-center px-10 md:hidden h-[400px]'>
-                            <img src={project.bgImage} alt={`${project.name}-bg-img`} className='object-cover w-full h-full rounded-md brightness-50' loading='lazy' decoding='async' fetchpriority='low' />
-                            <img src={project.image} alt={`${project.name}-mobile-img`} className=' absolute bg-center px-14 rounded-md' loading='lazy' decoding='async' fetchpriority='low' />
-                        </div>
-                    </div>
-                ))}
-                {/* desktop floating preview */}
-                <div ref={previewRef} className='fixed -top-2/6  left-0 z-50 overflow-hidden border-8 border-black pointer-events-none w-[960px] md:block opacity-0  hidden rounded-2xl'>
-                    {currentIndex !== null && projects[currentIndex] && (
-                        <img src={projects[currentIndex].image} alt={`${projects[currentIndex].name} preview`} className='object-cover w-full h-full rounded-md' loading='lazy' decoding='async' fetchpriority='low' />
-                    )}
-                </div>
+
+                                <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs tracking-wide text-black/80 transition-colors duration-300 md:text-sm lg:group-hover:text-white/90" aria-label="Technologies">
+                                    {project.frameworks.map((fw) => (
+                                        <li key={fw}>{fw}</li>
+                                    ))}
+                                </ul>
+
+                                <span
+                                    aria-hidden="true"
+                                    className={`hidden size-11 place-items-center justify-self-end rounded-full border border-black/30 transition-all duration-300 lg:grid ${linked ? 'lg:group-hover:border-gold lg:group-hover:bg-gold lg:group-hover:text-black lg:group-hover:rotate-45' : 'opacity-0'}`}
+                                >
+                                    <ArrowUpRight className="size-5" />
+                                </span>
+
+                                {/* mobile / tablet: small inline thumbnail, only when we have a screenshot */}
+                                {project.image && (
+                                    <img
+                                        src={project.image}
+                                        alt={`${project.name} screenshot`}
+                                        width={project.imageSize?.[0] ?? 1600}
+                                        height={project.imageSize?.[1] ?? 900}
+                                        className="mt-2 aspect-video w-full max-w-md rounded-lg object-cover object-top lg:hidden"
+                                        loading="lazy"
+                                        decoding="async"
+                                    />
+                                )}
+                            </Tag>
+                        </li>
+                    );
+                })}
+            </ul>
+
+            <div className="flex items-center justify-between px-10 py-10 text-sm tracking-[0.2em] uppercase">
+                <span className="text-black/65">More on GitHub</span>
+                <a
+                    href={socials.find((s) => s.name === 'GitHub')?.href}
+                    target="_blank"
+                    rel="me noopener noreferrer"
+                    className="inline-flex items-center gap-2 transition-colors hover:text-gold"
+                >
+                    github.com/junii03 <ArrowUpRight className="size-4" />
+                </a>
+            </div>
+
+            {/* desktop cursor-following preview: compact, screenshot-only */}
+            <div
+                ref={previewRef}
+                aria-hidden="true"
+                className="pointer-events-none fixed left-0 top-0 z-50 hidden overflow-hidden rounded-xl bg-black shadow-2xl ring-1 ring-black/10 lg:block"
+                style={{ width: PREVIEW_W, height: PREVIEW_H, opacity: 0, visibility: 'hidden' }}
+            >
+                {projects.map((p, i) =>
+                    p.image ? (
+                        <img
+                            key={p.id}
+                            src={p.image}
+                            alt=""
+                            width={p.imageSize?.[0] ?? 1600}
+                            height={p.imageSize?.[1] ?? 900}
+                            className="absolute inset-0 h-full w-full object-cover object-top transition-opacity duration-200"
+                            style={{ opacity: active === i ? 1 : 0 }}
+                            loading="lazy"
+                            decoding="async"
+                        />
+                    ) : null,
+                )}
             </div>
         </section>
-    )
-}
+    );
+};
 
-export default Works
+export default Works;

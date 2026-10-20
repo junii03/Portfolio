@@ -1,12 +1,52 @@
-# React + Vite
+# Junaid Afzal — Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Live: <https://junaid.is-a.dev/> · React 19 + Vite 7 + Tailwind 4 + GSAP + Lenis + react-three-fiber.
 
-Currently, two official plugins are available:
+```bash
+npm install
+npm run dev       # http://localhost:5173
+npm run build     # outputs dist/ (SEO files are generated here)
+npm run preview
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Where things live
 
-## Expanding the ESLint configuration
+| What | Where |
+| --- | --- |
+| Domain, title, description, contact details, verification tokens | `src/constants/site.js` |
+| All page copy (hero, services, experience, projects, skills, education) | `src/constants/index.js` |
+| Section UI | `src/sections/*` |
+| SEO generation (meta, JSON-LD, prerendered HTML, sitemap, robots, llms.txt) | `vite-plugins/seo.js` |
+| Cache + security headers (Vercel) | `vercel.json` |
+| IndexNow ping (production deploys only) | `scripts/indexnow.mjs` |
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Edit copy **once** in `src/constants` — the React UI, the structured data, the
+no-JS HTML snapshot and `llms.txt` are all generated from it.
+
+## SEO architecture
+
+- `<head>` (title, description, canonical, Open Graph, Twitter, JSON-LD `@graph` with
+  `Person`, `WebSite`, `ProfilePage`, project `ItemList`) is injected at build time.
+- A semantic HTML snapshot of the whole page is rendered inside `#root` for crawlers
+  that do not run JavaScript (it is visually hidden; React replaces it on mount, and it
+  is shown as plain content when JS is disabled).
+- `sitemap.xml` (with image entries), `robots.txt` and `llms.txt` are emitted into `dist/`.
+- To move domains, change `SITE.url` in `src/constants/site.js` and rebuild.
+
+## Search Console checklist (one-time, manual)
+
+1. Add `https://junaid.is-a.dev/` as a property in Google Search Console and Bing Webmaster
+   Tools; put the new meta tokens in `SITE.verification` (`src/constants/site.js`).
+2. Submit `https://junaid.is-a.dev/sitemap.xml`, then request indexing for the home page.
+3. Link to the portfolio from your LinkedIn, GitHub profile/README, Instagram and résumé.
+
+## Résumé PDF
+
+Export your résumé to `public/Junaid_Afzal_Resume.pdf` and set `resume: '/Junaid_Afzal_Resume.pdf'` in
+`src/constants/site.js` — the hero, stack, contact, sitemap-adjacent `llms.txt` links appear automatically.
+
+## Assets
+
+Original, un-optimised images and the original 18 MB `Planet.glb` are kept locally in
+`assets-src/` (git-ignored). Shipped versions are WebP images and a meshopt/WebP-compressed
+model (`public/models/Planet.glb`, ~1.6 MB).

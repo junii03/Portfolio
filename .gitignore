@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Original, un-optimized source assets (not shipped)
+assets-src/

@@ -1,12 +1,11 @@
 import { useRef } from "react";
 import AnimatedHeaderSection from "../components/AnimatedHeaderSection"
-import { servicesData } from "../constants";
+import { servicesData, servicesIntro } from "../constants";
 import { useMediaQuery } from "react-responsive";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 
 const Services = () => {
-    const text = 'From mobile apps to web platforms,\nI craft digital solutions that\nblend creativity and performance.';
     const seriveRef = useRef([]);
     const isDesktop = useMediaQuery({ minWidth: 768 });
     useGSAP(() => {
@@ -31,9 +30,9 @@ const Services = () => {
     return (
         <section id="services" className="relative min-h-screen bg-black rounded-t-4xl">
             <AnimatedHeaderSection
-                subtitle="Behind Every Click, There’s Code"
-                title="Services"
-                text={text}
+                subtitle={servicesIntro.subtitle}
+                title={servicesIntro.title}
+                text={servicesIntro.text}
                 textColor="text-white"
                 withScrollTrigger={true}
             />
@@ -52,17 +51,18 @@ const Services = () => {
                 >
                     <div className="flex items-center gap-4 justify-between font-light">
                         <div className="flex flex-col gap-6">
-                            <h2 className="text-4xl lg:text-5xl">{service.title}</h2>
+                            <h3 className="text-4xl lg:text-5xl">{service.title}</h3>
                             <p className="text-xl leading-relaxed tracking-widest lg:text-2xl text-white/60 text-pretty">
                                 {service.description}
                             </p>
                             <div className="flex flex-col gap-2 text-2xl sm:gap-4 lg:text-3xl text-white/80">
                                 {service.items.map((item, itemIndex) => (
                                     <div key={`item-${index}-${itemIndex}`}>
-                                        <h3 className="flex">
-                                            <span className="mr-12 text-lg text-white/30">0{itemIndex + 1}</span>
+                                        <h4 className="flex items-baseline">
+                                            <span className="mr-12 text-lg text-white/55">0{itemIndex + 1}</span>
                                             {item.title}
-                                        </h3>
+                                            <span className="ml-4 hidden text-base text-white/40 md:inline">{item.description}</span>
+                                        </h4>
                                         {itemIndex < service.items.length - 1 && (
                                             <div className="w-full h-px my-2 bg-white/30"></div>
                                         )}

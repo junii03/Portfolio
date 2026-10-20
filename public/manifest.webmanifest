@@ -1,24 +1,18 @@
 {
-    "name": "Junaid Afzal Portfolio",
-    "short_name": "Junaid",
-    "description": "Portfolio of Junaid Afzal, Software Engineer — projects, services, and contact.",
+    "name": "Junaid Afzal — Software Engineer",
+    "short_name": "Junaid Afzal",
+    "description": "Portfolio of Junaid Afzal — Flutter, React Native & NestJS software engineer based in Lahore, Pakistan.",
+    "id": "/",
     "start_url": "/",
     "scope": "/",
+    "lang": "en",
     "display": "standalone",
+    "categories": ["portfolio", "technology"],
     "theme_color": "#e5e5e0",
     "background_color": "#e5e5e0",
     "icons": [
-        {
-            "src": "/J.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "any"
-        },
-        {
-            "src": "/J.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "any"
-        }
+        { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+        { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+        { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
     ]
 }
