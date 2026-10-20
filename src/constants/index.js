@@ -160,12 +160,14 @@ export const worksIntro = {
     text: 'Selected projects across mobile, backend,\nAI and web — shipped, live and in progress.',
 };
 
+// `caseStudy` links the row to /projects/<slug>/ (see caseStudies.js); `href` is the external link.
 // `href` is optional — rows without one render as non-clickable (employer / academic work).
 // `image` is optional — rows without one simply show no hover preview.
 export const projects = [
     {
         id: 1,
         name: 'Oner Education',
+        caseStudy: 'oner-education',
         kind: 'Student placement platform · Astute Technologies',
         description:
             'Global student-placement app live on the Play Store across 60+ countries — fully modernized to the latest Flutter (all breaking deprecations resolved), plus an AI interview grader (Whisper + GPT-4o) and a RAG chatbot that recommends institutions.',
@@ -175,6 +177,7 @@ export const projects = [
     {
         id: 2,
         name: 'Leklok Backend v2',
+        caseStudy: 'leklok-backend',
         kind: 'Audio-first social platform · Astute Technologies',
         description:
             'Three NestJS microservices on MongoDB: a weight-based post recommendation algorithm, a full ads pipeline and a guest flow — shipped with GitHub Actions CI/CD.',
@@ -183,6 +186,7 @@ export const projects = [
     {
         id: 3,
         name: 'Farm2Fork',
+        caseStudy: 'farm2fork',
         kind: 'Final Year Project · University of Central Punjab · Apr 2026 – Feb 2027',
         description:
             'Farmer-to-consumer marketplace backed by a Hyperledger Fabric ledger, with AI modules — plus market research, competitor and SWOT analysis behind its go-to-market strategy, pricing and positioning.',
@@ -192,6 +196,7 @@ export const projects = [
     {
         id: 4,
         name: 'Banking System',
+        caseStudy: 'banking-system',
         kind: 'Semester project · Solo architecture',
         description:
             'Full-stack banking platform: NestJS API with Redis caching, JWT auth and WebSocket notifications, shared by a React dashboard and a React Native app — all REST APIs documented and tested via Swagger.',

@@ -84,15 +84,19 @@ const Works = () => {
             />
             <ul ref={listRef} className="relative flex flex-col border-t border-black/80 font-light" onMouseMove={onMouseMove}>
                 {projects.map((project, index) => {
-                    const Tag = project.href ? 'a' : 'div';
-                    const linkProps = project.href
-                        ? {
-                            href: project.href,
-                            target: '_blank',
-                            rel: 'noopener noreferrer',
-                            'aria-label': `${project.name} — opens in a new tab`,
-                        }
-                        : {};
+                    const internal = project.caseStudy ? `/projects/${project.caseStudy}/` : null;
+                    const linked = internal || project.href;
+                    const Tag = linked ? 'a' : 'div';
+                    const linkProps = internal
+                        ? { href: internal, 'aria-label': `${project.name} — read the case study` }
+                        : project.href
+                            ? {
+                                href: project.href,
+                                target: '_blank',
+                                rel: 'noopener noreferrer',
+                                'aria-label': `${project.name} — opens in a new tab`,
+                            }
+                            : {};
                     return (
                         <li key={project.id} className="project-row border-b border-black/80">
                             <Tag
@@ -100,8 +104,8 @@ const Works = () => {
                                 className="group relative grid gap-4 px-10 py-8 lg:grid-cols-[3rem_minmax(0,1.3fr)_minmax(0,1.6fr)_minmax(0,1fr)_3rem] lg:items-center lg:gap-8 lg:py-10"
                                 onMouseEnter={() => show(index)}
                                 onMouseLeave={() => hide(index)}
-                                onFocus={project.href ? (e) => onFocus(index, e) : undefined}
-                                onBlur={project.href ? () => hide(index) : undefined}
+                                onFocus={linked ? (e) => onFocus(index, e) : undefined}
+                                onBlur={linked ? () => hide(index) : undefined}
                             >
                                 <div
                                     aria-hidden="true"
@@ -110,13 +114,13 @@ const Works = () => {
                                     ref={(el) => { overlayRef.current[index] = el; }}
                                 />
 
-                                <span className="hidden text-sm tracking-[0.2em] text-black/40 transition-colors duration-300 lg:block lg:group-hover:text-white/50">
+                                <span className="hidden text-sm tracking-[0.2em] text-black/55 transition-colors duration-300 lg:block lg:group-hover:text-white/50">
                                     {pad(index + 1)}
                                 </span>
 
                                 <div className="transition-colors duration-300 lg:group-hover:text-white">
                                     <h3 className="text-3xl leading-tight lg:text-[40px]">{project.name}</h3>
-                                    <p className="mt-2 text-[11px] uppercase tracking-[0.25em] text-black/50 transition-colors duration-300 lg:group-hover:text-white/60">
+                                    <p className="mt-2 text-[11px] uppercase tracking-[0.25em] text-black/65 transition-colors duration-300 lg:group-hover:text-white/60">
                                         {project.kind}
                                     </p>
                                 </div>
@@ -133,7 +137,7 @@ const Works = () => {
 
                                 <span
                                     aria-hidden="true"
-                                    className={`hidden size-11 place-items-center justify-self-end rounded-full border border-black/30 transition-all duration-300 lg:grid ${project.href ? 'lg:group-hover:border-gold lg:group-hover:bg-gold lg:group-hover:text-black lg:group-hover:rotate-45' : 'opacity-0'}`}
+                                    className={`hidden size-11 place-items-center justify-self-end rounded-full border border-black/30 transition-all duration-300 lg:grid ${linked ? 'lg:group-hover:border-gold lg:group-hover:bg-gold lg:group-hover:text-black lg:group-hover:rotate-45' : 'opacity-0'}`}
                                 >
                                     <ArrowUpRight className="size-5" />
                                 </span>
@@ -157,7 +161,7 @@ const Works = () => {
             </ul>
 
             <div className="flex items-center justify-between px-10 py-10 text-sm tracking-[0.2em] uppercase">
-                <span className="text-black/50">More on GitHub</span>
+                <span className="text-black/65">More on GitHub</span>
                 <a
                     href={socials.find((s) => s.name === 'GitHub')?.href}
                     target="_blank"

@@ -32,6 +32,7 @@ import {
     certifications,
     contactIntro,
 } from '../src/constants/index.js';
+import { caseStudies } from '../src/constants/caseStudies.js';
 
 const abs = (p) => (/^https?:\/\//.test(p) ? p : `${SITE.url}${p.startsWith('/') ? '' : '/'}${p}`);
 const esc = (s = '') =>
@@ -173,12 +174,13 @@ function buildGraph(modified) {
     return { '@context': 'https://schema.org', '@graph': [person, portrait, ogImage, website, page, works] };
 }
 
-function buildHead(modified) {
-    const url = `${SITE.url}/`;
+function buildHead({ title, description, path = '/', graph, ogType = 'profile', keywords = SITE.keywords }) {
+    const url = `${SITE.url}${path}`;
+    const home = path === '/';
     const metas = [
-        `<title>${esc(SITE.title)}</title>`,
-        `<meta name="description" content="${esc(SITE.description)}" />`,
-        `<meta name="keywords" content="${esc(SITE.keywords.join(', '))}" />`,
+        `<title>${esc(title)}</title>`,
+        `<meta name="description" content="${esc(description)}" />`,
+        `<meta name="keywords" content="${esc(keywords.join(', '))}" />`,
         `<meta name="author" content="${esc(SITE.fullName)}" />`,
         `<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />`,
         `<meta name="theme-color" content="${SITE.themeColor}" media="(prefers-color-scheme: light)" />`,
@@ -192,12 +194,12 @@ function buildHead(modified) {
         `<link rel="alternate" hreflang="x-default" href="${url}" />`,
         `<link rel="sitemap" type="application/xml" href="/sitemap.xml" />`,
         `<link rel="alternate" type="text/plain" href="/llms.txt" title="LLM-readable summary" />`,
-        ...sameAs.map((h) => `<link rel="me" href="${esc(h)}" />`),
+        ...(home ? sameAs.map((h) => `<link rel="me" href="${esc(h)}" />`) : []),
         // Open Graph
-        `<meta property="og:type" content="profile" />`,
+        `<meta property="og:type" content="${ogType}" />`,
         `<meta property="og:site_name" content="${esc(SITE.name)} — Portfolio" />`,
-        `<meta property="og:title" content="${esc(SITE.title)}" />`,
-        `<meta property="og:description" content="${esc(SITE.description)}" />`,
+        `<meta property="og:title" content="${esc(title)}" />`,
+        `<meta property="og:description" content="${esc(description)}" />`,
         `<meta property="og:url" content="${url}" />`,
         `<meta property="og:locale" content="${SITE.locale}" />`,
         `<meta property="og:image" content="${abs(SITE.ogImage)}" />`,
@@ -206,16 +208,20 @@ function buildHead(modified) {
         `<meta property="og:image:width" content="1200" />`,
         `<meta property="og:image:height" content="630" />`,
         `<meta property="og:image:alt" content="${esc(SITE.ogImageAlt)}" />`,
-        `<meta property="profile:first_name" content="Muhammad Junaid" />`,
-        `<meta property="profile:last_name" content="Afzal" />`,
-        `<meta property="profile:username" content="junii03" />`,
+        ...(ogType === 'profile'
+            ? [
+                `<meta property="profile:first_name" content="Muhammad Junaid" />`,
+                `<meta property="profile:last_name" content="Afzal" />`,
+                `<meta property="profile:username" content="junii03" />`,
+            ]
+            : []),
         // Twitter / X
         `<meta name="twitter:card" content="summary_large_image" />`,
-        `<meta name="twitter:title" content="${esc(SITE.title)}" />`,
-        `<meta name="twitter:description" content="${esc(SITE.description)}" />`,
+        `<meta name="twitter:title" content="${esc(title)}" />`,
+        `<meta name="twitter:description" content="${esc(description)}" />`,
         `<meta name="twitter:image" content="${abs(SITE.ogImage)}" />`,
         `<meta name="twitter:image:alt" content="${esc(SITE.ogImageAlt)}" />`,
-        jsonLd(buildGraph(modified)),
+        jsonLd(graph),
     ];
     return metas.map((m) => `    ${m}`).join('\n');
 }
@@ -264,7 +270,7 @@ ${experience
 ${projects
     .map(
         (p) =>
-            `<article><h3>${p.href ? `<a href="${esc(p.href)}" rel="noopener noreferrer">${esc(p.name)}</a>` : esc(p.name)}</h3><p>${esc(p.kind)}</p><p>${esc(p.description)}</p><p>${esc(p.frameworks.join(', '))}</p></article>`,
+            `<article><h3>${p.caseStudy ? `<a href="/projects/${p.caseStudy}/">${esc(p.name)}</a>` : p.href ? `<a href="${esc(p.href)}" rel="noopener noreferrer">${esc(p.name)}</a>` : esc(p.name)}</h3><p>${esc(p.kind)}</p><p>${esc(p.description)}</p><p>${esc(p.frameworks.join(', '))}</p></article>`,
     )
     .join('\n')}
 </section>
@@ -284,6 +290,167 @@ ${SITE.resume ? `<p><a href="${SITE.resume}">Download résumé (PDF)</a></p>` : 
 </div>`;
 }
 
+const caseUrl = (slug) => `${SITE.url}/projects/${slug}/`;
+
+function buildCaseStudyGraph(cs, modified) {
+    const url = caseUrl(cs.slug);
+    return {
+        '@context': 'https://schema.org',
+        '@graph': [
+            {
+                '@type': 'WebPage',
+                '@id': `${url}#webpage`,
+                url,
+                name: cs.title,
+                description: cs.description,
+                inLanguage: SITE.language,
+                isPartOf: { '@id': WEBSITE_ID },
+                primaryImageOfPage: { '@id': `${SITE.url}/#primaryimage` },
+                dateModified: modified,
+                mainEntity: { '@id': `${url}#project` },
+                breadcrumb: { '@id': `${url}#breadcrumb` },
+            },
+            {
+                '@type': 'CreativeWork',
+                '@id': `${url}#project`,
+                name: cs.name,
+                headline: cs.headline,
+                description: cs.description,
+                keywords: [...cs.stack, ...cs.keywords].join(', '),
+                creator: { '@id': PERSON_ID },
+                author: { '@id': PERSON_ID },
+                inLanguage: SITE.language,
+                mainEntityOfPage: { '@id': `${url}#webpage` },
+                ...(cs.links[0] ? { sameAs: cs.links.map((l) => l.href) } : {}),
+            },
+            {
+                '@type': 'Person',
+                '@id': PERSON_ID,
+                name: SITE.name,
+                url: `${SITE.url}/`,
+            },
+            {
+                '@type': 'BreadcrumbList',
+                '@id': `${url}#breadcrumb`,
+                itemListElement: [
+                    { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE.url}/` },
+                    { '@type': 'ListItem', position: 2, name: 'Works', item: `${SITE.url}/#work` },
+                    { '@type': 'ListItem', position: 3, name: cs.name, item: url },
+                ],
+            },
+        ],
+    };
+}
+
+// Static, zero-JS case-study page. Styled with the same compiled Tailwind CSS as the SPA.
+function buildCaseStudyPage(cs, { cssTags, modified }) {
+    const others = caseStudies.filter((c) => c.slug !== cs.slug);
+    const head = buildHead({
+        title: cs.title,
+        description: cs.description,
+        path: `/projects/${cs.slug}/`,
+        graph: buildCaseStudyGraph(cs, modified),
+        ogType: 'article',
+        keywords: [cs.name, ...cs.keywords, SITE.name],
+    });
+    const meta = [
+        ['Role', cs.role],
+        ['Company', cs.company],
+        ['Period', cs.period],
+        ['Status', cs.status],
+    ];
+    return `<!doctype html>
+<html lang="${SITE.language}">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+${head}
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="preload" href="/fonts/amiamie/woff2/Amiamie-Light.woff2" as="font" type="font/woff2" crossorigin />
+${cssTags}
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to content</a>
+<header class="flex items-center justify-between px-6 py-6 text-sm uppercase tracking-[0.25em] md:px-10">
+    <a href="/" class="transition-colors hover:text-gold-deep">&larr; ${esc(SITE.name)}</a>
+    <a href="/#work" class="transition-colors hover:text-gold-deep">All work</a>
+</header>
+<main id="main">
+    <section class="rounded-4xl bg-black px-6 pb-16 pt-12 text-white md:px-10 md:pb-24 md:pt-20">
+        <p class="text-xs font-light uppercase tracking-[0.4em] text-white/60 md:text-sm">${esc(cs.kind)}</p>
+        <h1 class="mt-8 max-w-5xl text-5xl font-light uppercase leading-[1.02] md:text-7xl lg:text-8xl">${esc(cs.name)}</h1>
+        <p class="mt-8 max-w-3xl text-xl font-light leading-relaxed text-white/75 md:text-3xl">${esc(cs.headline)}</p>
+        <dl class="mt-14 grid gap-x-10 gap-y-8 border-t border-white/25 pt-8 sm:grid-cols-2 lg:grid-cols-4">
+${meta
+    .map(
+        ([k, v]) =>
+            `            <div><dt class="text-xs font-light uppercase tracking-[0.25em] text-white/55">${k}</dt><dd class="mt-2 text-base font-light md:text-lg">${esc(v)}</dd></div>`,
+    )
+    .join('\n')}
+        </dl>
+    </section>
+    <article class="mx-auto max-w-5xl px-6 py-16 font-light md:px-10 md:py-24">
+${cs.sections
+    .map(
+        (sec) => `        <section class="grid gap-4 border-t border-black/80 py-10 md:grid-cols-[minmax(0,1fr)_minmax(0,2.4fr)] md:gap-12 md:py-14">
+            <h2 class="text-3xl uppercase md:text-4xl">${esc(sec.heading)}</h2>
+            <div class="flex flex-col gap-5 text-lg leading-relaxed text-black/80 md:text-xl">
+${(sec.paragraphs || []).map((t) => `                <p>${esc(t)}</p>`).join('\n')}
+${
+    sec.bullets
+        ? `                <ul class="flex flex-col gap-4">${sec.bullets
+              .map(
+                  (b) =>
+                      `<li class="flex gap-4"><span aria-hidden="true" class="mt-[0.8em] h-px w-6 shrink-0 bg-gold-deep"></span><span>${esc(b)}</span></li>`,
+              )
+              .join('')}</ul>`
+        : ''
+}
+            </div>
+        </section>`,
+    )
+    .join('\n')}
+        <section class="grid gap-4 border-t border-black/80 py-10 md:grid-cols-[minmax(0,1fr)_minmax(0,2.4fr)] md:gap-12 md:py-14">
+            <h2 class="text-3xl uppercase md:text-4xl">Stack</h2>
+            <ul class="flex flex-wrap gap-2" aria-label="Technologies">${cs.stack
+                .map((t) => `<li class="rounded-full border border-black/40 px-4 py-1.5 text-sm tracking-wide md:text-base">${esc(t)}</li>`)
+                .join('')}</ul>
+        </section>
+${
+    cs.links.length
+        ? `        <p class="flex flex-wrap gap-4 border-t border-black/80 pt-10">${cs.links
+              .map(
+                  (l) =>
+                      `<a href="${esc(l.href)}" target="_blank" rel="noopener noreferrer" class="rounded-full bg-black px-6 py-3 text-xs uppercase tracking-[0.25em] text-white transition-colors hover:bg-DarkLava md:text-sm">${esc(l.label)} &nearr;</a>`,
+              )
+              .join('')}</p>`
+        : ''
+}
+    </article>
+    <nav aria-label="More case studies" class="rounded-t-4xl bg-black px-6 py-16 text-white md:px-10">
+        <h2 class="text-sm font-light uppercase tracking-[0.3em] text-white/60">More work</h2>
+        <ul class="mt-8 divide-y divide-white/20 border-y border-white/20">
+${others
+    .map(
+        (o) =>
+            `            <li><a href="/projects/${o.slug}/" class="flex items-center justify-between gap-6 py-6 text-2xl font-light transition-colors hover:text-gold md:text-4xl"><span>${esc(o.name)}</span><span class="hidden text-sm uppercase tracking-[0.2em] text-white/55 md:block">${esc(o.kind)}</span></a></li>`,
+    )
+    .join('\n')}
+        </ul>
+        <p class="mt-14 text-sm font-light uppercase tracking-[0.2em] text-white/60">
+            <a class="transition-colors hover:text-gold" href="mailto:${SITE.email}">${SITE.email}</a>
+            &nbsp;·&nbsp; ${socials.map((s) => `<a class="transition-colors hover:text-gold" href="${esc(s.href)}" target="_blank" rel="me noopener noreferrer">${esc(s.name)}</a>`).join(' &nbsp;·&nbsp; ')}
+        </p>
+    </nav>
+</main>
+</body>
+</html>
+`;
+}
+
 function buildSitemap(modified) {
     const images = [SITE.ogImage, SITE.portrait, ...projects.filter((p) => p.image).map((p) => p.image)];
     return `<?xml version="1.0" encoding="UTF-8"?>
@@ -295,6 +462,16 @@ function buildSitemap(modified) {
     <priority>1.0</priority>
 ${images.map((i) => `    <image:image><image:loc>${abs(i)}</image:loc></image:image>`).join('\n')}
   </url>
+${caseStudies
+    .map(
+        (c) => `  <url>
+    <loc>${caseUrl(c.slug)}</loc>
+    <lastmod>${modified}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>`,
+    )
+    .join('\n')}
 </urlset>
 `;
 }
@@ -322,6 +499,9 @@ ${experience
 ## Selected projects
 ${projects.map((p) => `- ${p.name}: ${p.description}${p.href ? ` (${p.href})` : ''}`).join('\n')}
 
+## Case studies
+${caseStudies.map((c) => `- [${c.name}](${caseUrl(c.slug)}): ${c.description}`).join('\n')}
+
 ## Skills
 ${skills.map((g) => `- ${g.group}: ${g.items.join(', ')}`).join('\n')}
 
@@ -337,17 +517,41 @@ ${SITE.resume ? `- [Résumé (PDF)](${abs(SITE.resume)})\n` : ''}${socials.map((
 
 export default function seoPlugin() {
     const modified = new Date().toISOString();
+    const homeHead = () =>
+        buildHead({ title: SITE.title, description: SITE.description, path: '/', graph: buildGraph(modified) });
     return {
         name: 'portfolio-seo',
         transformIndexHtml: {
             order: 'pre',
             handler(html) {
-                return html
-                    .replace('<!--seo:head-->', buildHead(modified))
-                    .replace('<!--seo:body-->', buildSnapshot());
+                return html.replace('<!--seo:head-->', homeHead()).replace('<!--seo:body-->', buildSnapshot());
             },
         },
-        generateBundle() {
+        // Dev server: serve the case-study pages so links work locally too.
+        configureServer(server) {
+            server.middlewares.use(async (req, res, next) => {
+                const m = req.url?.split('?')[0].match(/^\/projects\/([\w-]+)\/?$/);
+                const cs = m && caseStudies.find((c) => c.slug === m[1]);
+                if (!cs) return next();
+                const html = buildCaseStudyPage(cs, {
+                    cssTags: '    <script type="module">import "/src/index.css";</script>',
+                    modified,
+                });
+                res.setHeader('Content-Type', 'text/html');
+                res.end(await server.transformIndexHtml(req.url, html));
+            });
+        },
+        generateBundle(_, bundle) {
+            const entry = Object.values(bundle).find((c) => c.type === 'chunk' && c.isEntry);
+            const css = [...(entry?.viteMetadata?.importedCss ?? [])];
+            const cssTags = css.map((f) => `    <link rel="stylesheet" href="/${f}" />`).join('\n');
+            for (const cs of caseStudies) {
+                this.emitFile({
+                    type: 'asset',
+                    fileName: `projects/${cs.slug}/index.html`,
+                    source: buildCaseStudyPage(cs, { cssTags, modified }),
+                });
+            }
             this.emitFile({ type: 'asset', fileName: 'sitemap.xml', source: buildSitemap(modified) });
             this.emitFile({ type: 'asset', fileName: 'robots.txt', source: buildRobots() });
             this.emitFile({ type: 'asset', fileName: 'llms.txt', source: buildLlms() });
