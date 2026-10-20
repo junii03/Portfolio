@@ -195,13 +195,15 @@ export const projects = [
     },
     {
         id: 4,
-        name: 'Banking System',
+        name: 'HBL Banking System',
         caseStudy: 'banking-system',
-        kind: 'Semester project · Solo architecture',
+        kind: 'Semester project · Solo, web + mobile',
         description:
-            'Full-stack banking platform: NestJS API with Redis caching, JWT auth and WebSocket notifications, shared by a React dashboard and a React Native app — all REST APIs documented and tested via Swagger.',
+            'Full-stack banking platform I built solo: an Express and MongoDB API with Redis caching, JWT auth, role-based access and Socket.IO notifications, powering a React web app and an Expo React Native app.',
         href: 'https://github.com/junii03/Advance-Web-Programming/tree/main/Project',
-        frameworks: ['NestJS', 'Redis', 'JWT', 'WebSockets', 'React', 'React Native'],
+        image: '/assets/projects/hbl-clone.webp',
+        imageSize: [1600, 1000],
+        frameworks: ['Node.js', 'Express', 'MongoDB', 'Redis', 'Socket.IO', 'React', 'React Native'],
     },
     {
         id: 5,
@@ -213,17 +215,6 @@ export const projects = [
         image: '/assets/projects/scents-store.webp',
         imageSize: [1600, 928],
         frameworks: ['React', 'Firebase', 'Tailwind CSS'],
-    },
-    {
-        id: 6,
-        name: 'HBL Banking Clone',
-        kind: 'Web engineering project',
-        description:
-            'A full-stack online banking app featuring intuitive UI and secure transactions.',
-        href: 'https://github.com/junii03/Web-Engineering/tree/7fb9cdfccb73c08263b159a50482014f3856305c/WAD/Project',
-        image: '/assets/projects/hbl-clone.webp',
-        imageSize: [1600, 1000],
-        frameworks: ['React', 'Node.js', 'MongoDB', 'Tailwind CSS', 'Redis'],
     },
     {
         id: 7,
